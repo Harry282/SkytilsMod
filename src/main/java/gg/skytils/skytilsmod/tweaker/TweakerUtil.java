@@ -66,7 +66,7 @@ public class TweakerUtil {
 
         Icon icon = null;
         try {
-            URL url = SkytilsLoadingPlugin.class.getResource("/assets/skytils/sychicpet.gif");
+            URL url = SkytilsLoadingPlugin.class.getResource("/assets/skytils/splashes/sychicpet.gif");
             if (url != null) {
                 icon = new ImageIcon(Toolkit.getDefaultToolkit().createImage(url).getScaledInstance(50, 50, Image.SCALE_DEFAULT));
             }
