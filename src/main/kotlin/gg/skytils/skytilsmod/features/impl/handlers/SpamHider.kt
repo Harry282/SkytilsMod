@@ -179,14 +179,14 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
     }
 
     private enum class Regexs(var pattern: Regex) {
-        BLESSINGBUFF(Regex("(?<buff1>\\+[\\d,.%& \\+x]+) (?<symbol1>\\S{1,2})")),
+        BLESSINGBUFF(Regex("(?<buff1>\\+[\\d,.%& +x]+) (?<symbol1>\\S{1,2})")),
         BLESSINGGRANT(Regex("(?:Also g|G)rant.{1,2} you (.*) (?:and|&) (.*)\\.")),
         BLESSINGNAME(Regex("Blessing of (?<blessing>\\w+)")),
         BUILDINGTOOLS(Regex("(§eZapped §a\\d+ §eblocks! §a§lUNDO§r)|(§r§eUnzapped §r§c\\d+ §r§eblocks away!§r)|(§r§cYou may not Grand Architect that many blocks! \\(\\d+/\\d+\\)§r)|(§r§cYou have \\(\\d+/\\d+\\) of what you're attempting to place!§r)|(§eYou built §a\\d+ §eblocks! §a§lUNDO§r)|(§r§eUndid latest Grand Architect use of §r§c\\d+ §r§eblocks!§r)")),
         MANAUSED(Regex("(§b-\\d+ Mana \\(§6.+§b\\))")),
         SPOOKED(
             Regex(
-                "(§r§cYou died and lost [\\d,.]+ coins!§r)|(§r§dJust kidding! .+ §r§7spooked you!§r)|(§r§aAll your coins are fine, this was just a big mean spook :\\)§r)|(§r§c§lDO YOU REALLY WANT TO DELETE YOUR CURRENT PROFILE\\?§r)|(§r§cIt will delete in 10 seconds\\.\\.\\.§r)|(§r§c(?:[1-5]|\\.\\.\\.)§r)|(§r§7You just got spooked! .+ §r§7is the culprit!§r)|(§r§7False! .+ §r§7just §r§7spooked §r§7you!§r)|(§r§cYou had a blacklisted .+ §r§cin your inventory, we had to delete it! Sorry!§r)|(§r§aJK! Your items are fine\\. This was just a big spook :\\)§r)|(§r§[9-b]§l▬+§r)|(§r§eFriend request from §r§d\\[PIG§r§b\\+\\+\\+§r§d\\] Technoblade§r)|(§r§a§l\\[ACCEPT\\] §r§8- §r§c§l\\[DENY\\] §r§8- §r§7§l\\[IGNORE\\]§r)|(§r§7Nope! .+ §r§7just §r§7spooked §r§7you!§r)|(§r§aOnly kidding! We won't give you op ;\\)§r)|(§r§eYou are now op!§r)|(§r§aYour profile is fine! This was just an evil spook :\\)§r)|(§r§aYou're fine! Nothing changed with your guild status! :\\)§r)|(§r§cYou were kicked from your guild with reason '.+'§r)|(§r§aSorry, its just a spook bro\\. :\\)§r)"
+                "(§r§cYou died and lost [\\d,.]+ coins!§r)|(§r§dJust kidding! .+ §r§7spooked you!§r)|(§r§aAll your coins are fine, this was just a big mean spook :\\)§r)|(§r§c§lDO YOU REALLY WANT TO DELETE YOUR CURRENT PROFILE\\?§r)|(§r§cIt will delete in 10 seconds\\.\\.\\.§r)|(§r§c(?:[1-5]|\\.\\.\\.)§r)|(§r§7You just got spooked! .+ §r§7is the culprit!§r)|(§r§7False! .+ §r§7just §r§7spooked §r§7you!§r)|(§r§cYou had a blacklisted .+ §r§cin your inventory, we had to delete it! Sorry!§r)|(§r§aJK! Your items are fine\\. This was just a big spook :\\)§r)|(§r§[9-b]§l▬+§r)|(§r§eFriend request from §r§d\\[PIG§r§b\\+\\+\\+§r§d] Technoblade§r)|(§r§a§l\\[ACCEPT] §r§8- §r§c§l\\[DENY] §r§8- §r§7§l\\[IGNORE]§r)|(§r§7Nope! .+ §r§7just §r§7spooked §r§7you!§r)|(§r§aOnly kidding! We won't give you op ;\\)§r)|(§r§eYou are now op!§r)|(§r§aYour profile is fine! This was just an evil spook :\\)§r)|(§r§aYou're fine! Nothing changed with your guild status! :\\)§r)|(§r§cYou were kicked from your guild with reason '.+'§r)|(§r§aSorry, its just a spook bro\\. :\\)§r)"
             )
         ),
         POWDERCHEST(Regex("§r§aYou received §r§b\\+(?<amount>[\\d,]+) §r§a(?<type>Gemstone|Mithril) Powder\\.§r"))
@@ -320,6 +320,26 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                     }
                 }
 
+                // Healer Tethers
+                formatted.startsWith("§r§eYou formed a tether") -> {
+                    when (Skytils.config.tetherHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.tetherHider == 2)
+                    }
+                }
+
+                // Self Orb Pickups
+                formatted.startsWith("§r§c◕ §r§eYou picked up a") -> {
+                    when (Skytils.config.selfOrbHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.selfOrbHider == 2)
+                    }
+                }
+
+                // Other Orb Pickups
+                formatted.contains("§r§epicked up your ") -> {
+                    when (Skytils.config.otherOrbHider) {
+                        1, 2 -> cancelChatPacket(event, Skytils.config.otherOrbHider == 2)
+                    }
+                }
 
                 // Blessings
                 formatted.contains("§r§6§lDUNGEON BUFF!") -> {
@@ -601,27 +621,6 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                     }
                 }
 
-                // Healer Tethers
-                formatted.startsWith("§r§eYou formed a tether") -> {
-                    when (Skytils.config.tetherHider) {
-                        1, 2 -> cancelChatPacket(event, Skytils.config.tetherHider == 2)
-                    }
-                }
-
-                // Self Orb Pickups
-                formatted.startsWith("§r§c◕ §r§eYou picked up a") -> {
-                    when (Skytils.config.selfOrbHider) {
-                        1, 2 -> cancelChatPacket(event, Skytils.config.selfOrbHider == 2)
-                    }
-                }
-
-                // Other Orb Pickups
-                formatted.contains("§r§epicked up your ") -> {
-                    when (Skytils.config.otherOrbHider) {
-                        1, 2 -> cancelChatPacket(event, Skytils.config.otherOrbHider == 2)
-                    }
-                }
-
                 // Traps
                 formatted.startsWithAny(
                     "§r§cThe Tripwire Trap",
@@ -745,7 +744,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
             while (i in spamMessages.indices) {
                 val message = reversed[i]
                 val messageWidth = ScreenRenderer.fontRenderer.getStringWidth(
-                    message?.message?.stripControlCodes()
+                    message.message.stripControlCodes()
                 )
                 if (scaleY > sr.scaledHeight / 2f) {
                     message.height += (i * 10 - message.height) * (animDiv * 5)
