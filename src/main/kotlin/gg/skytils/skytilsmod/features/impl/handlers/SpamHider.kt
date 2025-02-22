@@ -133,7 +133,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         "You stumbled upon a Sea Guardian.",
         "It looks like you've disrupted the Sea Witch's brewing session. Watch out, she's furious!",
         "You reeled in a Sea Archer.",
-        "The Monster of the Deep has emerged.",
+        "The Rider of the Deep has emerged.",
         "Huh? A Catfish!",
         "Is this even a Fish? It's the Carrot King!",
         "Gross! A Sea Leech!",
