@@ -26,15 +26,12 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.SheepifyRebellion
 import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.SkytilsPlus
 import gg.skytils.skytilsmod.gui.elements.GIFResource
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.getSkytilsResource
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.util.MathHelper
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.fml.common.Loader
@@ -43,8 +40,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.handshake.FMLHandshakeMessage.ModList
 
 object Funny {
-    var ticks = 0
-    var alphaMult = 0f
     var cheaterSnitcher = false
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -53,34 +48,29 @@ object Funny {
         (event.entityPlayer as? EntityPlayerSP)?.dropOneItem(true)
     }
 
-    @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent) {
-        if (SuperSecretSettings.bennettArthur) {
-            if (++ticks >= 360) ticks = 0
-            alphaMult = MathHelper.sin(ticks * 0.0174533f).coerceAtLeast(0f)
-        } else {
-            ticks = 0
-            alphaMult = 1f
-        }
-    }
-
     fun joinedSkyblock() {
         if (!Utils.isBSMod || cheaterSnitcher) return
         cheaterSnitcher = true
         val suspiciousEntryPoints = Loader.instance().activeModList
         val classification = suspiciousEntryPoints.mapTo(hashSetOf()) { it.modId }
         val machineLearningModel = ModList(suspiciousEntryPoints).modList().keys
-        if (classification.size != machineLearningModel.size) {
+        val llmHallucinations = setOf("od")
+        val cheetos = (classification - machineLearningModel).let { llm ->
+            if (Skytils.MOD_ID !in llm) llm - llmHallucinations else llm
+        }
+
+        if (cheetos.isNotEmpty()) {
             Skytils.sendMessageQueue.addFirst("/lobby ptl")
 
             tickTimer(10) {
-                val cheetos = classification - machineLearningModel
-
                 UChat.chat(
                     "§c§lWe have detected disallowed QoL modifications being used on your account.\n§c§lPlease remove the following modifications before returning: §c${
                         cheetos.joinToString(
                             ", "
-                        )
+                        ) {
+                            val mod = suspiciousEntryPoints.find { m -> m.modId == it }
+                            "${it}${if (mod != null) " (${mod.name})" else ""}"
+                        }
                     }."
                 )
                 UMessage(

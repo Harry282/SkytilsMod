@@ -33,6 +33,7 @@ import gg.skytils.skytilsmod.asm.SkytilsTransformer
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorWorldInfo
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.graphics.colors.ColorFactory.web
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
@@ -55,6 +56,7 @@ import net.minecraft.nbt.NBTTagList
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.*
+import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.MinecraftForge
 import org.objectweb.asm.tree.MethodInsnNode
@@ -62,6 +64,8 @@ import java.awt.Color
 import java.io.File
 import java.io.IOException
 import java.util.*
+import kotlin.io.path.Path
+import kotlin.io.path.notExists
 import kotlin.math.floor
 
 
@@ -77,7 +81,7 @@ object Utils {
     var dungeons = false
 
     val inDungeons: Boolean
-        get() = dungeons || SBInfo.mode == "dungeon"
+        get() = dungeons || SBInfo.mode == SkyblockIsland.Dungeon.mode
 
     @JvmField
     var isOnHypixel = false
@@ -97,6 +101,7 @@ object Utils {
     var random = Random()
 
     val isBSMod by lazy {
+        if ("noBS" + Calendar.getInstance().get(Calendar.YEAR) in SuperSecretSettings.settings) return@lazy false
         val cal = Calendar.getInstance()
         return@lazy cal.get(Calendar.MONTH) == Calendar.APRIL && cal.get(Calendar.DAY_OF_MONTH) == 1
     }
@@ -121,7 +126,8 @@ object Utils {
      * @author BiscuitDevelopment
      */
     fun playLoudSound(sound: String?, pitch: Double) {
-        shouldBypassVolume = true
+        if (!Skytils.config.disableVolumeOverrides)
+            shouldBypassVolume = true
         mc.thePlayer.playSound(sound, 1f, pitch.toFloat())
         shouldBypassVolume = false
     }
@@ -205,13 +211,15 @@ object Utils {
     @Throws(IOException::class)
     fun getJavaRuntime(): String {
         val os = System.getProperty("os.name")
-        val java = "${System.getProperty("java.home")}${File.separator}bin${File.separator}${
-            if (os != null && os.lowercase().startsWith("windows")) "java.exe" else "java"
-        }"
-        if (!File(java).isFile) {
+        val java = Path(System.getProperty("java.home"))
+            .resolve("bin")
+            .resolve(if (os != null && os.lowercase().startsWith("windows")) "java.exe" else "java")
+
+        if (java.notExists()) {
             throw IOException("Unable to find suitable java runtime at $java")
         }
-        return java
+
+        return java.toAbsolutePath().toString()
     }
 
     fun checkBossName(floor: String, bossName: String): Boolean {
@@ -375,16 +383,13 @@ fun MethodInsnNode.matches(owner: String?, name: String?, desc: String?): Boolea
 }
 
 val gg.skytils.hypixel.types.player.Player.rank_prefix
-    get() = when(rank) {
+    get() = when (rank) {
         "VIP" -> "§a[VIP]"
         "VIP_PLUS" -> "§a[VIP§6+§a]"
         "MVP" -> "§b[MVP]"
         "MVP_PLUS" -> "§b[MVP${ChatColor.valueOf(plus_color)}+§b]"
         "MVP_PLUS_PLUS" -> "${ChatColor.valueOf(mvp_plus_plus_color)}[MVP${ChatColor.valueOf(plus_color)}++${ChatColor.valueOf(mvp_plus_plus_color)}]"
-        "HELPER" -> "§9[HELPER]"
-        "MODERATOR" -> "§2[MOD]"
-        "GAME_MASTER" -> "§2[GM]"
-        "ADMIN" -> "§c[ADMIN]"
+        "STAFF" -> "§c[§6ዞ§c]"
         "YOUTUBER" -> "§c[§fYOUTUBE§c]"
         else -> "§7"
     }
@@ -405,13 +410,13 @@ fun <E> List<E>.getLastOrNull(index: Int) = getOrNull(lastIndex - index)
 fun <T> Iterator<T>.nextOrNull(): T? = if (hasNext()) next() else null
 
 inline val Vec3.x
-    get() = this.xCoord
+    inline get() = this.xCoord
 
 inline val Vec3.y
-    get() = this.yCoord
+    inline get() = this.yCoord
 
 inline val Vec3.z
-    get() = this.zCoord
+    inline get() = this.zCoord
 
 operator fun Vec3.plus(other: Vec3): Vec3 = add(other)
 operator fun Vec3.minus(other: Vec3): Vec3 = subtract(other)
@@ -432,3 +437,6 @@ fun <T> List<T>.elementPairs() = sequence {
         for (j in i + 1..<arr.size)
             yield(arr[i] to arr[j])
 }
+
+inline val World.realWorldTime: Long
+    inline get() = (worldInfo as AccessorWorldInfo).realWorldTime

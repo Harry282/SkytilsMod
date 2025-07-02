@@ -90,7 +90,6 @@ object ItemFeatures {
 
     private val headPattern =
         Regex("(?:DIAMOND|GOLD)_(?:(BONZO)|(SCARF)|(PROFESSOR)|(THORN)|(LIVID)|(SADAN)|(NECRON))_HEAD")
-    private val requirementPattern = Regex("CATACOMBS:(?<level>\\d+)")
 
     // TODO: it is possible for 2 items to have the same name but different material
     val itemIdToNameLookup = hashMapOf<String, String>()
@@ -436,19 +435,20 @@ object ItemFeatures {
 
         if (Skytils.config.showItemQuality && extraAttr != null) {
             val boost = extraAttr.getInteger("baseStatBoostPercentage")
-            val tier = extraAttr.getInteger("item_tier")
+            
+            if (boost > 0) {
+                val tier = extraAttr.getInteger("item_tier")
 
-            if (boost > 0 && tier > 0) {
-                val isMasterMode =
-                    requirementPattern
-                        .matchEntire(
-                            extraAttr.getString("dungeon_skill_req")
-                        )?.groupValues?.get(1)?.toIntOrNull()?.let { it > 24 }
+                val req = extraAttr.getString("dungeon_skill_req")
 
-                val floor = when (isMasterMode) {
-                    true -> "§4M${tier - 3}"
-                    false -> "§aF$tier"
-                    else -> "§b$tier"
+                val floor: String = if (req.isEmpty() && tier == 0) "§aE" else if (req.isEmpty()) "§bF${tier}" else {
+                    val (dungeon, level) = req.split(':', limit = 2)
+                    val levelReq = level.toIntOrNull() ?: 0
+                    if (dungeon == "CATACOMBS") {
+                        if (levelReq - tier > 19) "§4M${tier-3}" else "§aF$tier"
+                    } else {
+                        "§b${dungeon} $tier"
+                    }
                 }
 
                 val color = when {
@@ -458,7 +458,7 @@ object ItemFeatures {
                     else -> "§b"
                 }
 
-                event.toolTip.add("§6Quality Bonus: +$color$boost% §7($floor§7)")
+                event.toolTip.add("§6Quality Bonus: $color+$boost% §7($floor§7)")
             }
         }
 
@@ -711,7 +711,7 @@ object ItemFeatures {
                 val level = petInfo.level
                 val maxLevel = if (petInfo.type == "GOLDEN_DRAGON") 200 else 100
 
-                if (petInfo.candyUsed > 0 && level != maxLevel) {
+                if (petInfo.candyUsed > 0 && (SuperSecretSettings.alwaysShowPetCandy || level != maxLevel)) {
                     stackTip = petInfo.candyUsed.toString()
                 }
             }

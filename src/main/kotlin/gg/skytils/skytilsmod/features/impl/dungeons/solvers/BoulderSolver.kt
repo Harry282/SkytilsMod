@@ -27,7 +27,6 @@ import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
-import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -41,9 +40,7 @@ import net.minecraft.world.World
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 import kotlin.math.floor
-import kotlin.random.Random
 
 object BoulderSolver {
     var boulderChest: BlockPos? = null
@@ -67,7 +64,7 @@ object BoulderSolver {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!Skytils.config.boulderSolver || !DungeonListener.missingPuzzles.contains("Boulder")) return
+        if (!Skytils.config.boulderSolver || !DungeonListener.incompletePuzzles.contains("Boulder")) return
         if (boulderChest == null) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         if (roomVariant >= 0) {
@@ -119,7 +116,7 @@ object BoulderSolver {
     class BoulderPush(var x: Int, var y: Int, var direction: Direction)
 
     fun update() {
-        if (!Skytils.config.boulderSolver || !DungeonListener.missingPuzzles.contains("Boulder")) return
+        if (!Skytils.config.boulderSolver || !DungeonListener.incompletePuzzles.contains("Boulder")) return
         val player = mc.thePlayer
         val world: World? = mc.theWorld
         if ((job == null || job?.isCancelled == true || job?.isCompleted == true) && Utils.inDungeons && world != null && player != null && roomVariant != -2) {
@@ -205,8 +202,6 @@ object BoulderSolver {
                             }
                             if (isRight) {
                                 roomVariant = i
-                                if (SuperSecretSettings.bennettArthur) roomVariant =
-                                    Random.nextInt(0, expectedBoulders.size)
                                 UChat.chat("$successPrefix §aSkytils detected boulder variant ${roomVariant + 1}.")
                                 break
                             }

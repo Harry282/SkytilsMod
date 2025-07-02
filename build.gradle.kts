@@ -34,24 +34,29 @@ plugins {
     signing
 }
 
-version = "1.10.10"
+version = "1.12.0-pre1"
 group = "gg.skytils"
 
 repositories {
     mavenLocal()
     mavenCentral()
-    maven("https://repo.sk1er.club/repository/maven-public/")
-    maven("https://repo.sk1er.club/repository/maven-releases/")
+    maven("https://repo.essential.gg/repository/maven-public/")
+    maven("https://repo.essential.gg/repository/maven-releases/")
     maven("https://repo.hypixel.net/repository/Hypixel/")
     maven("https://jitpack.io") {
         mavenContent {
             includeGroupAndSubgroups("com.github")
         }
     }
+    maven("https://maven.dediamondpro.dev/releases") {
+        mavenContent {
+            includeGroup("dev.dediamondpro")
+        }
+    }
 }
 
 vineflower {
-    toolVersion.set("1.11.0")
+    toolVersion.set("1.11.1")
 }
 
 loom {
@@ -96,15 +101,25 @@ val shadowMeMod: Configuration by configurations.creating {
 
 dependencies {
     shadowMe("gg.essential:loader-launchwrapper:1.2.3")
-    implementation("gg.essential:essential-1.8.9-forge:16425+g3a090c5c88") {
+    implementation("gg.essential:essential-1.8.9-forge:17141+gd6f4cfd3a8") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
         exclude(module = "gson")
         exclude(module = "vigilance")
     }
+    implementation("gg.essential:universalcraft-1.8.9-forge") {
+        version {
+            strictly("[401,)")
+        }
+    }
     shadowMe("com.github.Skytils.Vigilance:vigilance-1.8.9-forge:afb0909442") {
         isTransitive = false
+    }
+
+    shadowMe("dev.dediamondpro:minemark-elementa:1.2.3") {
+        excludeKotlin()
+        exclude(module = "elementa-1.8.9-forge")
     }
 
     shadowMeMod("com.github.Skytils:AsmHelper:91ecc2bd9c") {
@@ -116,52 +131,55 @@ dependencies {
     }
 
     shadowMe(platform(kotlin("bom")))
-    shadowMe(platform(ktor("bom", "2.3.12", addSuffix = false)))
+    shadowMe(platform(ktor("bom", "2.3.13", addSuffix = false)))
 
-    shadowMe(ktor("serialization-kotlinx-json"))
+    shadowMe(ktor("serialization-kotlinx-json")) { excludeKotlin() }
 
     shadowMe("org.jetbrains.kotlinx:kotlinx-serialization-json") {
         version {
             strictly("[1.5.1,)")
             prefer("1.6.2")
         }
+        excludeKotlin()
     }
 
-    shadowMe(ktorClient("core"))
-    shadowMe(ktorClient("cio"))
-    shadowMe(ktorClient("content-negotiation"))
-    shadowMe(ktorClient("encoding"))
+    shadowMe(ktorClient("core")) { excludeKotlin() }
+    shadowMe(ktorClient("cio")) { excludeKotlin() }
+    shadowMe(ktorClient("content-negotiation")) { excludeKotlin() }
+    shadowMe(ktorClient("encoding")) { excludeKotlin() }
 
-    shadowMe(ktorServer("core"))
-    shadowMe(ktorServer("cio"))
-    shadowMe(ktorServer("content-negotiation"))
-    shadowMe(ktorServer("compression"))
-    shadowMe(ktorServer("cors"))
-    shadowMe(ktorServer("conditional-headers"))
-    shadowMe(ktorServer("auto-head-response"))
-    shadowMe(ktorServer("default-headers"))
-    shadowMe(ktorServer("host-common"))
-    shadowMe(ktorServer("auth"))
+    shadowMe(ktorServer("core")) { excludeKotlin() }
+    shadowMe(ktorServer("cio")) { excludeKotlin() }
+    shadowMe(ktorServer("content-negotiation")) { excludeKotlin() }
+    shadowMe(ktorServer("compression")) { excludeKotlin() }
+    shadowMe(ktorServer("cors")) { excludeKotlin() }
+    shadowMe(ktorServer("conditional-headers")) { excludeKotlin() }
+    shadowMe(ktorServer("auto-head-response")) { excludeKotlin() }
+    shadowMe(ktorServer("default-headers")) { excludeKotlin() }
+    shadowMe(ktorServer("host-common")) { excludeKotlin() }
+    shadowMe(ktorServer("auth")) { excludeKotlin() }
 
     shadowMe("org.brotli:dec:0.1.2")
-    shadowMe("com.aayushatharva.brotli4j:brotli4j:1.16.0")
+    shadowMe("com.aayushatharva.brotli4j:brotli4j:1.18.0")
 
-    shadowMe(project(":events"))
-    shadowMe(project(":hypixel-api:types"))
-    shadowMe(project(":ws-shared"))
+    shadowMe(project(":events")) { excludeKotlin() }
+    shadowMe(project(":hypixel-api:types")) { excludeKotlin() }
+    shadowMe(project(":ws-shared")) { excludeKotlin() }
 
     shadowMe("org.bouncycastle:bcpg-jdk18on:1.78.1") {
         exclude(module = "bcprov-jdk18on")
     }
     compileOnly("org.bouncycastle:bcprov-jdk18on:1.78.1")
 
+    shadowMe("org.incendo:cloud-kotlin-coroutines-annotations:2.0.0") { excludeKotlin() }
+    shadowMe("org.incendo:cloud-kotlin-extensions:2.0.0") { excludeKotlin() }
 
-    compileOnly("net.hypixel:mod-api-forge:1.0.1.1") {
+    compileOnly("net.hypixel:mod-api-forge:1.0.1.2") {
         exclude(group = "me.djtheredstoner", module = "DevAuth-forge-legacy")
     }
-    shadowMe("net.hypixel:mod-api-forge-tweaker:1.0.1.1")
+    shadowMe("net.hypixel:mod-api-forge-tweaker:1.0.1.2")
 
-    shadowMe(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0-beta.4")!!)
+    shadowMe(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0-rc.1")!!)
     annotationProcessor("org.spongepowered:mixin:0.8.7:processor")
     compileOnly("org.spongepowered:mixin:0.8.5")
 }
@@ -316,3 +334,9 @@ fun DependencyHandler.ktor(module: String, version: String? = null, addSuffix: B
 fun DependencyHandler.ktorClient(module: String, version: String? = null) = ktor("client-${module}", version)
 
 fun DependencyHandler.ktorServer(module: String, version: String? = null) = ktor("server-${module}", version)
+
+fun <T : ModuleDependency> T.excludeKotlin(): T {
+    exclude(group = "org.jetbrains.kotlin")
+    exclude(module = "kotlinx-coroutines-core")
+    return this
+}

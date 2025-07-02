@@ -21,11 +21,8 @@ package gg.skytils.skytilsmod
 import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UKeyboard
-import gg.skytils.skytilsmod.commands.impl.*
-import gg.skytils.skytilsmod.commands.stats.impl.CataCommand
-import gg.skytils.skytilsmod.commands.stats.impl.SlayerCommand
+import gg.skytils.skytilsmod.commands.SkytilsCommands
 import gg.skytils.skytilsmod.core.*
-import gg.skytils.skytilsmod.events.impl.HypixelPacketEvent
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.crimson.KuudraChestProfit
@@ -69,7 +66,6 @@ import gg.skytils.skytilsmod.localapi.LocalAPI
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import gg.skytils.skytilsmod.mixins.hooks.entity.EntityPlayerSPHook
 import gg.skytils.skytilsmod.mixins.hooks.util.MouseHelperHook
-import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiStreamUnavailable
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorSettingsGui
 import gg.skytils.skytilsmod.tweaker.DependencyLoader
@@ -84,6 +80,7 @@ import io.ktor.client.plugins.cache.*
 import io.ktor.client.plugins.compression.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.http.*
+import io.ktor.network.tls.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
@@ -97,9 +94,9 @@ import net.minecraft.client.network.NetHandlerPlayClient
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.launchwrapper.Launch
+import net.minecraft.network.PacketBuffer
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.server.*
-import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -120,6 +117,8 @@ import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
 import java.security.KeyStore
+import java.security.PrivateKey
+import java.security.cert.X509Certificate
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadPoolExecutor
@@ -181,17 +180,11 @@ class Skytils {
         @JvmField
         var displayScreen: GuiScreen? = null
 
-        @JvmField
-        val threadPool = Executors.newFixedThreadPool(10) as ThreadPoolExecutor
-
-        @JvmField
-        val dispatcher = threadPool.asCoroutineDispatcher()
-
         val IO = object : CoroutineScope {
             override val coroutineContext = Dispatchers.IO + SupervisorJob() + CoroutineName("Skytils IO")
         }
 
-        override val coroutineContext: CoroutineContext = dispatcher + SupervisorJob() + CoroutineName("Skytils")
+        override val coroutineContext: CoroutineContext = Dispatchers.Default + SupervisorJob() + CoroutineName("Skytils")
 
         val deobfEnvironment by lazy {
             Launch.blackboard.getOrDefault("fml.deobfuscatedEnvironment", false) as Boolean
@@ -232,6 +225,31 @@ class Skytils {
             UnionX509TrustManager(backingManager, ourManager)
         }
 
+        val certificates by lazy {
+            val ks = KeyStore.getInstance(KeyStore.getDefaultType())
+            Skytils::class.java.getResourceAsStream("/skytilsclientcerts.jks").use {
+                ks.load(it, "skytilsontop".toCharArray())
+            }
+
+            val certificatesAndKeys = mutableListOf<CertificateAndKey>()
+
+            ks.aliases().iterator().forEach { alias ->
+                if (ks.isKeyEntry(alias)) {
+                    val key = ks.getKey(alias, "skytilsontop".toCharArray())
+                    if (key is PrivateKey) {
+                        val certChain = ks.getCertificateChain(alias)?.filterIsInstance<X509Certificate>()
+                        if (certChain != null && certChain.isNotEmpty()) {
+                            certificatesAndKeys.add(CertificateAndKey(certChain.toTypedArray(), key))
+                        }
+                    }
+                }
+            }
+
+            if (certificatesAndKeys.isEmpty()) error("No certificate and private key pairs found in the keystore")
+
+            return@lazy certificatesAndKeys
+        }
+
         val client = HttpClient(CIO) {
             install(ContentEncoding) {
                 customEncoder(BrotliEncoder, 1.0F)
@@ -261,6 +279,7 @@ class Skytils {
                     socketTimeout = 10000
                 }
                 https {
+                    this.certificates += Companion.certificates
                     trustManager = Skytils.trustManager
                 }
             }
@@ -302,6 +321,8 @@ class Skytils {
             ServerPayloadInterceptor,
             SoundQueue,
             UpdateChecker,
+
+            NEUCompatibility,
 
             AlignmentTaskSolver,
             AntiFool,
@@ -412,48 +433,7 @@ class Skytils {
 
     @Mod.EventHandler
     fun loadComplete(event: FMLLoadCompleteEvent) {
-        val cch = ClientCommandHandler.instance
-
-        if (cch !is AccessorCommandHandler) throw RuntimeException(
-            "Skytils was unable to mixin to the CommandHandler. Please report this on our Discord at discord.gg/skytils."
-        )
-        cch.registerCommand(SkytilsCommand)
-
-        cch.registerCommand(CataCommand)
-        cch.registerCommand(CalcXPCommand)
-        cch.registerCommand(FragBotCommand)
-        cch.registerCommand(HollowWaypointCommand)
-        cch.registerCommand(ItemCycleCommand)
-        cch.registerCommand(OrderedWaypointCommand)
-        cch.registerCommand(ScamCheckCommand)
-        cch.registerCommand(SlayerCommand)
-        cch.registerCommand(TrophyFishCommand)
-
-        if (!cch.commands.containsKey("armorcolor")) {
-            cch.registerCommand(ArmorColorCommand)
-        }
-
-        if (!cch.commands.containsKey("glintcustomize")) {
-            cch.registerCommand(GlintCustomizeCommand)
-        }
-
-        if (!cch.commands.containsKey("protectitem")) {
-            cch.registerCommand(ProtectItemCommand)
-        }
-
-        if (!cch.commands.containsKey("trackcooldown")) {
-            cch.registerCommand(TrackCooldownCommand)
-        }
-
-        cch.commandSet.add(RepartyCommand)
-        cch.commandMap["skytilsreparty"] = RepartyCommand
-        if (config.overrideReparty || !cch.commands.containsKey("reparty")) {
-            cch.commandMap["reparty"] = RepartyCommand
-        }
-
-        if (config.overrideReparty || !cch.commands.containsKey("rp")) {
-            cch.commandMap["rp"] = RepartyCommand
-        }
+        SkytilsCommands
 
         if (UpdateChecker.currentVersion.specialVersionType != UpdateChecker.UpdateType.RELEASE && config.updateChannel == 2) {
             if (ModChecker.canShowNotifications) {
@@ -548,13 +528,13 @@ class Skytils {
             TrophyFish.loadFromApi()
         }
 
-        if (config.connectToWS)
-            WSClient.openConnection()
-    }
-
-    @SubscribeEvent
-    fun onHypixelPacketFail(event: HypixelPacketEvent.FailedEvent) {
-        UChat.chat("$failPrefix Mod API request failed: ${event.reason}")
+        if (config.connectToWS) {
+            if (WSClient.connected) {
+                WSClient.closeConnection().invokeOnCompletion {
+                    WSClient.openConnection()
+                }
+            } else WSClient.openConnection()
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -565,8 +545,8 @@ class Skytils {
         }
         if (!Utils.inSkyblock && Utils.isOnHypixel && event.packet is S3DPacketDisplayScoreboard && event.packet.func_149371_c() == 1) {
             Utils.skyblock = event.packet.func_149370_d() == "SBScoreboard"
-            printDevMessage("score ${event.packet.func_149370_d()}", "utils")
-            printDevMessage("sb ${Utils.inSkyblock}", "utils")
+            printDevMessage({ "score ${event.packet.func_149370_d()}" }, "utils")
+            printDevMessage({ "sb ${Utils.inSkyblock}" }, "utils")
         }
         if (event.packet is S1CPacketEntityMetadata && mc.thePlayer != null) {
             val nameObj = event.packet.func_149376_c()?.find { it.dataValueId == 2 } ?: return
@@ -577,7 +557,12 @@ class Skytils {
             }
         }
         if (!Utils.isOnHypixel && event.packet is S3FPacketCustomPayload && event.packet.channelName == "MC|Brand") {
-            val brand = event.packet.bufferData.readStringFromBuffer(Short.MAX_VALUE.toInt())
+            val buffer = event.packet.bufferData
+
+            val bufferCpy = PacketBuffer(buffer.duplicate())
+            bufferCpy.resetReaderIndex()
+
+            val brand = bufferCpy.readStringFromBuffer(Short.MAX_VALUE.toInt())
             if (brand.lowercase().contains("hypixel")) {
                 Utils.isOnHypixel = true
             }
@@ -590,7 +575,7 @@ class Skytils {
             val name = playerData?.displayName?.formattedText ?: playerData?.profile?.name ?: return@forEach
             areaRegex.matchEntire(name)?.let { result ->
                 Utils.dungeons = Utils.inSkyblock && result.groups["area"]?.value == "Dungeon"
-                printDevMessage("dungeons ${Utils.inDungeons} action ${event.packet.action}", "utils")
+                printDevMessage({ "dungeons ${Utils.inDungeons} action ${event.packet.action}" }, "utils")
                 if (Utils.inDungeons)
                     ScoreCalculation.updateText(ScoreCalculation.totalScore.get())
                 return@forEach

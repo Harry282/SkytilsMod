@@ -86,11 +86,11 @@ object ScoreCalculation {
     var clearedPercentage = BasicState(0)
     val totalRoomMap = mutableMapOf<Int, Int>()
     val totalRooms = (clearedPercentage.zip(completedRooms)).map { (clear, complete) ->
-        printDevMessage("total clear $clear complete $complete", "scorecalcroom")
+        printDevMessage({ "total clear $clear complete $complete" }, "scorecalcroom")
         val a = if (clear > 0 && complete > 0) {
             (100 * (complete / clear.toDouble())).roundToInt()
         } else 0
-        printDevMessage("total? $a", "scorecalcroom")
+        printDevMessage({ "total? $a" }, "scorecalcroom")
         if (a == 0) return@map 0
         totalRoomMap[a] = (totalRoomMap[a] ?: 0) + 1
         totalRoomMap.toList().maxByOrNull { it.second }!!.first
@@ -100,9 +100,9 @@ object ScoreCalculation {
     }
     val calcingClearPercentage = calcingCompletedRooms.map { complete ->
         val total = totalRooms.get()
-        printDevMessage("total $total complete $complete", "scorecalcroom")
+        printDevMessage({ "total $total complete $complete" }, "scorecalcroom")
         val a = if (total > 0) (complete / total.toDouble()).coerceAtMost(1.0) else 0.0
-        printDevMessage("calced room clear $a", "scorecalcroom")
+        printDevMessage({ "calced room clear $a" }, "scorecalcroom")
         a
     }
     val roomClearScore = calcingClearPercentage.map {
@@ -133,7 +133,7 @@ object ScoreCalculation {
 
 
     val discoveryScore = (roomClearScore.zip(secretScore)).map { (clear, secret) ->
-        printDevMessage("clear $clear secret $secret", "scorecalcexplore")
+        printDevMessage({ "clear $clear secret $secret" }, "scorecalcexplore")
         if (DungeonFeatures.dungeonFloor == "E") (clear * 0.7).toInt() + (secret * 0.7).toInt()
         else clear.toInt() + secret.toInt()
     }
@@ -149,7 +149,7 @@ object ScoreCalculation {
     // puzzle stuff
     var missingPuzzles = BasicState(0).also {
         it.onSetValue {
-            printDevMessage("missing puzzles $it", "scorecalcpuzzle")
+            printDevMessage({ "missing puzzles $it" }, "scorecalcpuzzle")
         }
     }
     var failedPuzzles = BasicState(0)
@@ -159,7 +159,7 @@ object ScoreCalculation {
     }
 
     val skillScore = (calcingClearPercentage.zip(deathPenalty.zip(puzzlePenalty))).map { (clear, penalties) ->
-        printDevMessage("puzzle penalty ${penalties.second}", "scorecalcpuzzle")
+        printDevMessage({ "puzzle penalty ${penalties.second}" }, "scorecalcpuzzle")
         if (DungeonFeatures.dungeonFloor == "E")
             ((20.0 + clear * 80.0 - penalties.first - penalties.second) * 0.7).toInt()
         else (20.0 + clear * 80.0 - penalties.first - penalties.second).toInt()
@@ -208,9 +208,9 @@ object ScoreCalculation {
 
     val totalScore =
         ((skillScore.zip(discoveryScore)).zip(speedScore.zip(bonusScore))).map { (first, second) ->
-            printDevMessage("skill score ${first.first}", "scorecalcpuzzle")
-            printDevMessage(
-                "skill ${first.first} disc ${first.second} speed ${second.first} bonus ${second.second}",
+            printDevMessage({ "skill score ${first.first}" }, "scorecalcpuzzle")
+            printDevMessage({
+                "skill ${first.first} disc ${first.second} speed ${second.first} bonus ${second.second}" },
                 "scorecalctotal"
             )
             if (DungeonFeatures.dungeonFloor == "E")
@@ -261,48 +261,62 @@ object ScoreCalculation {
         Utils.checkThreadAndQueue {
             ScoreCalculationElement.text.clear()
             if (!Utils.inDungeons) return@checkThreadAndQueue
-            if (Skytils.config.minimizedScoreCalculation) {
-                val color = when {
-                    score < 270 -> 'c'
-                    score < 300 -> 'e'
-                    else -> 'a'
-                }
-                ScoreCalculationElement.text.add("§eScore: §$color$score §7($rank§7)")
-            } else {
-                ScoreCalculationElement.text.add("§9Dungeon Status")
-                ScoreCalculationElement.text.add("§f• §eDeaths:§c ${deaths.get()} ${if (firstDeathHadSpirit.get()) "§7(§6Spirit§7)" else ""}")
-                ScoreCalculationElement.text.add("§f• §eMissing Puzzles:§c ${missingPuzzles.get()}")
-                ScoreCalculationElement.text.add("§f• §eFailed Puzzles:§c ${failedPuzzles.get()}")
-                if (foundSecrets.get() > 0) ScoreCalculationElement.text.add(
-                    "§f• §eSecrets: ${if (foundSecrets.get() >= totalSecretsNeeded.get()) "§a" else "§c"}${foundSecrets.get()}§7/§a${totalSecretsNeeded.get()} " +
-                            if (floorReq.get().secretPercentage != 1.0) "§7(§6Total: ${totalSecrets.get()}§7)" else ""
-                )
-                ScoreCalculationElement.text.add("§f• §eCrypts:§a ${crypts.get()}")
-                if (dungeonFloorNumber?.let { it >= 6 } == true) {
-                    ScoreCalculationElement.text.add("§f• §eMimic:§l${if (mimicKilled.get()) "§a ✔" else "§c ✘"}")
-                }
-                ScoreCalculationElement.text.add("")
-                ScoreCalculationElement.text.add("§6Score")
-                if (DungeonFeatures.dungeonFloor == "E")
-                    ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(14, 70)}")
-                else
-                    ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(20, 100)}")
-                ScoreCalculationElement.text.add(
-                    "§f• §eExplore Score:§a ${discoveryScore.get()} §7(§e${
-                        roomClearScore.get().toInt()
-                    } §7+ §6${secretScore.get().toInt()}§7)"
-                )
-                ScoreCalculationElement.text.add("§f• §eSpeed Score:§a ${speedScore.get()}")
 
-                if (DungeonFeatures.dungeonFloor == "E") {
-                    ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${ceil(bonusScore.get() * 0.7).toInt()}")
-                    ScoreCalculationElement.text.add("§f• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+7§7)" else "")
-                } else {
-                    ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${bonusScore.get()}")
-                    ScoreCalculationElement.text.add("§f• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+10§7)" else "")
-                }
-                ScoreCalculationElement.text.add("§f• §eRank: $rank")
+            when (Skytils.config.scoreCalculationStyle) {
+                2 -> { // bm style
+                    val scoreColor = when {
+                        score < 270 -> 'c'
+                        score < 300 -> 'e'
+                        else -> 'a'
+                    }
 
+                    val cryptColor = if (crypts.get() >= 5) 'a' else 'c'
+
+                    ScoreCalculationElement.text.add("§$scoreColor${totalScore.get()}  §$cryptColor${crypts.get()}c  ${if (mimicKilled.get()) "§a✔" else "§c✘"}")
+                }
+                1 -> { // minimized style
+                    val color = when {
+                        score < 270 -> 'c'
+                        score < 300 -> 'e'
+                        else -> 'a'
+                    }
+                    ScoreCalculationElement.text.add("§eScore: §$color$score §7($rank§7)")
+                }
+                else -> { // standard style
+                    ScoreCalculationElement.text.add("§9Dungeon Status")
+                    ScoreCalculationElement.text.add("§f• §eDeaths:§c ${deaths.get()} ${if (firstDeathHadSpirit.get()) "§7(§6Spirit§7)" else ""}")
+                    ScoreCalculationElement.text.add("§f• §eMissing Puzzles:§c ${missingPuzzles.get()}")
+                    ScoreCalculationElement.text.add("§f• §eFailed Puzzles:§c ${failedPuzzles.get()}")
+                    if (foundSecrets.get() > 0) ScoreCalculationElement.text.add(
+                        "§f• §eSecrets: ${if (foundSecrets.get() >= totalSecretsNeeded.get()) "§a" else "§c"}${foundSecrets.get()}§7/§a${totalSecretsNeeded.get()} " +
+                                if (floorReq.get().secretPercentage != 1.0) "§7(§6Total: ${totalSecrets.get()}§7)" else ""
+                    )
+                    ScoreCalculationElement.text.add("§f• §eCrypts:§a ${crypts.get()}")
+                    if (dungeonFloorNumber?.let { it >= 6 } == true) {
+                        ScoreCalculationElement.text.add("§f• §eMimic:§l${if (mimicKilled.get()) "§a ✔" else "§c ✘"}")
+                    }
+                    ScoreCalculationElement.text.add("")
+                    ScoreCalculationElement.text.add("§6Score")
+                    if (DungeonFeatures.dungeonFloor == "E")
+                        ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(14, 70)}")
+                    else
+                        ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(20, 100)}")
+                    ScoreCalculationElement.text.add(
+                        "§f• §eExplore Score:§a ${discoveryScore.get()} §7(§e${
+                            roomClearScore.get().toInt()
+                        } §7+ §6${secretScore.get().toInt()}§7)"
+                    )
+                    ScoreCalculationElement.text.add("§f• §eSpeed Score:§a ${speedScore.get()}")
+
+                    if (DungeonFeatures.dungeonFloor == "E") {
+                        ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${ceil(bonusScore.get() * 0.7).toInt()}")
+                        ScoreCalculationElement.text.add("§f• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+7§7)" else "")
+                    } else {
+                        ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${bonusScore.get()}")
+                        ScoreCalculationElement.text.add("§f• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+10§7)" else "")
+                    }
+                    ScoreCalculationElement.text.add("§f• §eRank: $rank")
+                }
             }
         }
     }
@@ -348,6 +362,7 @@ object ScoreCalculation {
     fun onTabChange(event: MainReceivePacketEvent<*, *>) {
         if (
             !Utils.inDungeons ||
+            DungeonTimer.scoreShownAt != -1L ||
             event.packet !is S38PacketPlayerListItem ||
             (event.packet.action != S38PacketPlayerListItem.Action.UPDATE_DISPLAY_NAME &&
                     event.packet.action != S38PacketPlayerListItem.Action.ADD_PLAYER)
@@ -364,7 +379,7 @@ object ScoreCalculation {
                 name.contains("Puzzles:") -> {
                     val matcher = missingPuzzlePattern.find(name) ?: return@forEach
                     missingPuzzles.set(matcher.groups["count"]?.value?.toIntOrNull() ?: 0)
-                    printDevMessage("puzzles ${missingPuzzles.get()}", "scorecalcpuzzle")
+                    printDevMessage({ "puzzles ${missingPuzzles.get()}" }, "scorecalcpuzzle")
                     updateText(totalScore.get())
                 }
 
@@ -387,7 +402,7 @@ object ScoreCalculation {
                         val matcher = secretsFoundPercentagePattern.find(name) ?: return@forEach
                         val percentagePer = (matcher.groups["percentage"]?.value?.toDoubleOrNull()
                             ?: 0.0)
-                        printDevMessage("percent $percentagePer", "scorecalcsecrets")
+                        printDevMessage({ "percent $percentagePer" }, "scorecalcsecrets")
                         totalSecrets.set(
                             if (foundSecrets.get() > 0 && percentagePer > 0) floor(100f / percentagePer * foundSecrets.get() + 0.5).toInt() else 0
                         )
@@ -405,8 +420,8 @@ object ScoreCalculation {
                 name.contains("Completed Rooms") -> {
                     val matcher = roomCompletedPattern.find(name) ?: return@forEach
                     completedRooms.set(matcher.groups["count"]?.value?.toIntOrNull() ?: return@forEach)
-                    printDevMessage("count ${completedRooms.get()} percent ${clearedPercentage.get()}", "scorecalc")
-                    printDevMessage("Total rooms: ${totalRooms.get()}", "scorecalc")
+                    printDevMessage({ "count ${completedRooms.get()} percent ${clearedPercentage.get()}" }, "scorecalc")
+                    printDevMessage({ "Total rooms: ${totalRooms.get()}" }, "scorecalc")
                 }
             }
         }
@@ -421,7 +436,7 @@ object ScoreCalculation {
             ) firstDeathHadSpirit.set(
                 true
             )
-            printDevMessage("you died. spirit: ${firstDeathHadSpirit.get()}", "scorecalcdeath")
+            printDevMessage({ "you died. spirit: ${firstDeathHadSpirit.get()}" }, "scorecalcdeath")
         }
     }
 
@@ -540,16 +555,18 @@ object ScoreCalculation {
     class ScoreCalculationElement : GuiElement("Dungeon Score Estimate", x = 200, y = 100) {
         override fun render() {
             if (toggled && Utils.inDungeons) {
+                if (Skytils.config.hideScoreEstimateBoss && DungeonTimer.bossEntryTime != -1L) return // don't render in boss (config)
                 RenderUtil.drawAllInList(this, text)
             }
         }
 
         override fun demoRender() {
-            if (Skytils.config.minimizedScoreCalculation) {
-                RenderUtil.drawAllInList(this, demoMin)
-            } else {
-                RenderUtil.drawAllInList(this, demoText)
+            val scoreStyle = when (Skytils.config.scoreCalculationStyle) {
+                2 -> demoBM
+                1 -> demoMin
+                else -> demoText
             }
+            RenderUtil.drawAllInList(this, scoreStyle)
         }
 
         companion object {
@@ -571,13 +588,21 @@ object ScoreCalculation {
                 "§f• §eRank: §6§lS+"
             )
             private val demoMin = listOf("§eScore: §e300 §7(§6§lS+§7)")
+            private val demoBM = listOf("§a301  §c4c  §a✔")
             val text = ArrayList<String>()
         }
 
         override val height: Int
-            get() = if (Skytils.config.minimizedScoreCalculation) ScreenRenderer.fontRenderer.FONT_HEIGHT else ScreenRenderer.fontRenderer.FONT_HEIGHT * demoText.size
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * when (Skytils.config.scoreCalculationStyle) {
+                0 -> demoText.size
+                else -> 1 // if demo is more than 1 line multiply by its size, otherwise multiply by 1
+            }
         override val width: Int
-            get() = demoText.maxOf { ScreenRenderer.fontRenderer.getStringWidth(it) }
+            get() = (when (Skytils.config.scoreCalculationStyle) {
+                2 -> demoBM
+                1 -> demoMin
+                else -> demoText
+            }).maxOf { ScreenRenderer.fontRenderer.getStringWidth(it) }
 
         override val toggled: Boolean
             get() = Skytils.config.showScoreCalculation

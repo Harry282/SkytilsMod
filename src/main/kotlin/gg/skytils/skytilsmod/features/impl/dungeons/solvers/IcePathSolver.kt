@@ -22,7 +22,6 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
-import gg.skytils.skytilsmod.features.impl.funny.Funny
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
@@ -42,7 +41,7 @@ import java.awt.Point
 import kotlin.math.abs
 
 object IcePathSolver {
-    private val steps: MutableList<Point?> = ArrayList()
+    private val steps: MutableList<Point> = ArrayList()
     private var silverfishChestPos: BlockPos? = null
     private var roomFacing: EnumFacing? = null
     private var grid: Array<IntArray>? = null
@@ -51,7 +50,7 @@ object IcePathSolver {
 
     init {
         tickTimer(20, repeats = true) {
-            if (!Utils.inDungeons || !Skytils.config.icePathSolver || mc.thePlayer == null || "Ice Path" !in DungeonListener.missingPuzzles) return@tickTimer
+            if (!Utils.inDungeons || !Skytils.config.icePathSolver || mc.thePlayer == null || "Ice Path" !in DungeonListener.incompletePuzzles) return@tickTimer
             if (silverfishChestPos != null && roomFacing != null && silverfish != null) {
                 if (grid == null) {
                     grid = getGridLayout()
@@ -123,18 +122,10 @@ object IcePathSolver {
         if (!Skytils.config.icePathSolver) return
         if (silverfishChestPos != null && roomFacing != null && grid != null && silverfish?.isEntityAlive == true) {
             GlStateManager.disableCull()
-            steps.zipWithNext().forEach { (point, point2) ->
-                val pos = getVec3RelativeToGrid(point!!.x, point.y)
-                val pos2 = getVec3RelativeToGrid(point2!!.x, point2.y)
-                RenderUtil.draw3DLine(
-                    pos!!.addVector(0.5, 0.5, 0.5),
-                    pos2!!.addVector(0.5, 0.5, 0.5),
-                    5,
-                    Color(1f, 0f, 0f, Funny.alphaMult),
-                    event.partialTicks,
-                    UMatrixStack.Compat.get()
-                )
-            }
+
+            val points = steps.map { getVec3RelativeToGrid(it.x, it.y)!!.addVector(0.5, 0.5, 0.5) }
+            RenderUtil.draw3DLineStrip(points, 5, Color.RED, event.partialTicks, UMatrixStack.Compat.get())
+
             GlStateManager.enableCull()
         }
     }
@@ -202,7 +193,7 @@ object IcePathSolver {
      * @link https://stackoverflow.com/a/55271133
      * @author ofekp
      */
-    private fun solve(iceCave: Array<IntArray>, startX: Int, startY: Int, endX: Int, endY: Int): ArrayList<Point?> {
+    private fun solve(iceCave: Array<IntArray>, startX: Int, startY: Int, endX: Int, endY: Int): ArrayList<Point> {
         val startPoint = Point(startX, startY)
         val queue = ArrayDeque<Point>()
         val iceCaveColors = Array(
@@ -210,7 +201,7 @@ object IcePathSolver {
         ) { arrayOfNulls<Point>(iceCave[0].size) }
         queue.addLast(Point(startX, startY))
         iceCaveColors[startY][startX] = startPoint
-        while (queue.size != 0) {
+        while (queue.isNotEmpty()) {
             val currPos = queue.removeFirst()
             // traverse adjacent nodes while sliding on the ice
             for (dir in EnumFacing.HORIZONTALS) {
@@ -221,7 +212,7 @@ object IcePathSolver {
                         currPos.x, currPos.y
                     )
                     if (nextPos.getY() == endY.toDouble() && nextPos.getX() == endX.toDouble()) {
-                        val steps = ArrayList<Point?>()
+                        val steps = ArrayList<Point>()
                         // we found the end point
                         var tmp = currPos // if we start from nextPos we will count one too many edges
                         var count = 0

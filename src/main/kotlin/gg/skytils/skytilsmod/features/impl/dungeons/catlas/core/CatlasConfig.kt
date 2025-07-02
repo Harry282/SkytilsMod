@@ -20,10 +20,8 @@ package gg.skytils.skytilsmod.features.impl.dungeons.catlas.core
 
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.data.*
-import gg.skytils.skytilsmod.utils.DungeonClass
 import java.awt.Color
 import java.io.File
-import java.util.EnumMap
 
 object CatlasConfig : Vigilant(
     File("./config/skytils/catlas/config.toml"),
@@ -157,6 +155,21 @@ object CatlasConfig : Vigilant(
     var playerHeadScale = 1f
 
     @Property(
+        name = "Head Class Border Scale",
+        type = PropertyType.DECIMAL_SLIDER,
+        description = "Scale of the class colour outline on the player head",
+        category = "Map",
+        subcategory = "Size",
+        maxF = 1f,
+        minF = 0f,
+        decimalPlaces = 2,
+        i18nName = "catlas.config.map.size.head_border_scale",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.size"
+    )
+    var playerBorderPercentage = 0.2f
+
+    @Property(
         name = "Player Name Scale",
         type = PropertyType.DECIMAL_SLIDER,
         description = "Scale of player names relative to head size.",
@@ -207,6 +220,42 @@ object CatlasConfig : Vigilant(
     var mapBorderWidth = 3f
 
     @Property(
+        name = "Boss Map Enabled",
+        type = PropertyType.SWITCH,
+        description = "Render the boss map!",
+        category = "Boss Map",
+        subcategory = "Toggle",
+        i18nName = "catlas.config.boss_map.toggle.boss_map_enabled",
+        i18nCategory = "catlas.config.boss_map",
+        i18nSubcategory = "catlas.config.boss_map.toggle"
+    )
+    var bossMapEnabled = false
+
+    @Property(
+        name = "Boss Map Player Icons",
+        type = PropertyType.SWITCH,
+        description = "Render the player icons on the boss map.",
+        category = "Boss Map",
+        subcategory = "Icons",
+        i18nName = "catlas.config.boss_map.icons.player_icons",
+        i18nCategory = "catlas.config.boss_map",
+        i18nSubcategory = "catlas.config.boss_map.icons"
+    )
+    var bossMapPlayerIcons = true
+
+    @Property(
+        name = "Boss Map Terminal Icons",
+        type = PropertyType.SWITCH,
+        description = "Render the terminal icons on the boss map.",
+        category = "Boss Map",
+        subcategory = "Icons",
+        i18nName = "catlas.config.boss_map.icons.terminal_icons",
+        i18nCategory = "catlas.config.boss_map",
+        i18nSubcategory = "catlas.config.boss_map.icons"
+    )
+    var bossMapTerminalIcons = true
+
+    @Property(
         name = "Room Names",
         type = PropertyType.SELECTOR,
         description = "Shows names of rooms on map.",
@@ -234,7 +283,7 @@ object CatlasConfig : Vigilant(
         type = PropertyType.SELECTOR,
         description = "Shows total secrets of rooms on map.",
         category = "Rooms",
-        options = ["Off", "On", "Replace Checkmark"],
+        options = ["Off", "On", "Replace Checkmark", "Replace Uncleared Checkmark"],
         i18nName = "catlas.config.rooms..room_secrets",
         i18nCategory = "catlas.config.rooms"
     )
@@ -361,8 +410,8 @@ object CatlasConfig : Vigilant(
         subcategory = "Players",
         allowAlpha = true,
         i18nName = "catlas.config.colors.players.player_border_color_archer",
-        i18nCategory = "catlas.config.map",
-        i18nSubcategory = "catlas.config.map.render"
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.players"
     )
     var colorPlayerArcher = Color(0, 0, 0, 255)
 
@@ -373,8 +422,8 @@ object CatlasConfig : Vigilant(
         subcategory = "Players",
         allowAlpha = true,
         i18nName = "catlas.config.colors.players.player_border_color_berserk",
-        i18nCategory = "catlas.config.map",
-        i18nSubcategory = "catlas.config.map.render"
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.players"
     )
     var colorPlayerBerserk = Color(0, 0, 0, 255)
 
@@ -385,8 +434,8 @@ object CatlasConfig : Vigilant(
         subcategory = "Players",
         allowAlpha = true,
         i18nName = "catlas.config.colors.players.player_border_color_healer",
-        i18nCategory = "catlas.config.map",
-        i18nSubcategory = "catlas.config.map.render"
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.players"
     )
     var colorPlayerHealer = Color(0, 0, 0, 255)
 
@@ -397,8 +446,8 @@ object CatlasConfig : Vigilant(
         subcategory = "Players",
         allowAlpha = true,
         i18nName = "catlas.config.colors.players.player_border_color_mage",
-        i18nCategory = "catlas.config.map",
-        i18nSubcategory = "catlas.config.map.render"
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.players"
     )
     var colorPlayerMage = Color(0, 0, 0, 255)
 
@@ -409,8 +458,8 @@ object CatlasConfig : Vigilant(
         subcategory = "Players",
         allowAlpha = true,
         i18nName = "catlas.config.colors.players.player_border_color_tank",
-        i18nCategory = "catlas.config.map",
-        i18nSubcategory = "catlas.config.map.render"
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.players"
     )
     var colorPlayerTank = Color(0, 0, 0, 255)
 
@@ -597,7 +646,11 @@ object CatlasConfig : Vigilant(
     init {
         initialize()
         setCategoryDescription(
-            "Map", "Catlas is a fork of works created by SkyblockAddons, UnclaimedBloom6, and Harry282"
+            "Map", "Catlas is a fork of works created by SkyblockAddons contributors (including Phoube and TirelessTraveler), UnclaimedBloom6, and Harry282"
+        )
+
+        setCategoryDescription(
+            "Boss Map", "Boss Maps might not be allowed on Hypixel. Use at your own risk.\nModifications that alter the look and feel of the in-game head-up display (HUD), without adding extra information which would normally be unavailable to the player [are allowed]... mini-maps, other player health/armor indicators, player distance/range, etc. are not."
         )
     }
 

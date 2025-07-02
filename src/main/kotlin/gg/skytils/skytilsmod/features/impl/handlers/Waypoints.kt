@@ -93,7 +93,7 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
             categories.addAll(json.decodeFromString<CategoryList>(data).categories)
 
         } else if (Base64.isBase64(str)) {
-            json.decodeFromStream<JsonElement>(Base64InputStream(str.byteInputStream())).let { element ->
+            Base64InputStream(str.byteInputStream()).use<_, JsonElement>(json::decodeFromStream).let { element ->
                 when (element) {
                     is JsonObject -> {
                         categories.addAll(
@@ -120,11 +120,11 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
                 }
             }
         } else if (sbeWaypointFormat.containsMatchIn(str)) {
-            val island = SkyblockIsland.entries.find { it.mode == SBInfo.mode } ?: SkyblockIsland.CrystalHollows
+            val island = SkyblockIsland.byMode[SBInfo.mode] ?: SkyblockIsland.CrystalHollows
             val waypoints = sbeWaypointFormat.findAll(str.trim().replace("\n", "")).map {
                 Waypoint(
                     it.groups["name"]!!.value,
-                    it.groups["x"]!!.value.toInt(), // For some dumb reason SBE inverts the x coordinate
+                    it.groups["x"]!!.value.toInt(),
                     it.groups["y"]!!.value.toInt(),
                     it.groups["z"]!!.value.toInt(),
                     true,
@@ -141,7 +141,54 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
                     island = island
                 )
             )
-        } else throw IllegalArgumentException("Unknown waypoint format")
+        } else {
+            try {
+                val genericArray = json.decodeFromString<JsonArray>(str)
+                val foundWaypoints = hashMapOf<SkyblockIsland, HashSet<Waypoint>>()
+
+                for (element in genericArray) {
+                    val obj = element.jsonObject
+
+                    val options = obj["options"]?.jsonObject
+
+                    val pos = obj["pos"].let {
+                        if (it == null) BlockPos(obj["x"]!!.jsonPrimitive.int, obj["y"]!!.jsonPrimitive.int, obj["z"]!!.jsonPrimitive.int)
+                        else if (it is JsonPrimitive) BlockPos.fromLong(it.long)
+                        else BlockPos(it.jsonObject["x"]!!.jsonPrimitive.int, it.jsonObject["y"]!!.jsonPrimitive.int, it.jsonObject["z"]!!.jsonPrimitive.int)
+                    }
+
+                    var r = (obj["r"] ?: options?.get("r"))?.jsonPrimitive?.float
+                    var g = (obj["g"] ?: options?.get("g"))?.jsonPrimitive?.float
+                    var b = (obj["b"] ?: options?.get("b"))?.jsonPrimitive?.float
+
+                    if ((r != null && g != null && b != null) && (r > 1 || g > 1 || b > 1)) {
+                        r /= 255
+                        g /= 255
+                        b /= 255
+                    }
+
+                    val name = (obj["name"] ?: options?.get("name"))?.jsonPrimitive?.content ?: "Unnamed"
+                    val color = obj["color"]?.jsonPrimitive?.content?.let(Utils::colorFromString) ?: Color(r ?: 1f, g ?: 0f, b ?: 0f)
+                    val island = SkyblockIsland.byMode[((obj["island"] ?: obj["mode"])?.jsonPrimitive?.content)] ?: if (Utils.isOnHypixel) SkyblockIsland.current else SkyblockIsland.CrystalHollows
+
+                    foundWaypoints.getOrPut(island) { hashSetOf() }.add(Waypoint(name, pos.x, pos.y, pos.z, true, color, System.currentTimeMillis()))
+                }
+
+                foundWaypoints.forEach { (island, waypoints) ->
+                    categories.add(
+                        WaypointCategory(
+                            name = null,
+                            waypoints = waypoints,
+                            isExpanded = true,
+                            island = island
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                throw IllegalArgumentException("Unknown waypoint format")
+            }
+        }
 
         return categories
     }
@@ -163,7 +210,7 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
             else -> throw IllegalArgumentException("Unknown version $version")
         }
 
-        return json.decodeFromStream<CategoryList>(inputStream)
+        return inputStream.use(json::decodeFromStream)
     }
 
     fun getStringFromWaypoints(categories: Set<WaypointCategory>, version: Int): String {
@@ -223,14 +270,13 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
             printDevMessage("Waypoints unloaded from compute, reason: SB check", "waypoints")
             return
         }
-        val mode = SBInfo.mode
-        val isUnknownIsland = SkyblockIsland.entries.none { it.mode == mode }
+        val currIsland = SkyblockIsland.current
         visibleWaypoints = categories.filter {
-            it.island.mode == mode || (isUnknownIsland && it.island == SkyblockIsland.Unknown)
+            it.island == currIsland
         }.flatMap { category ->
             category.waypoints.filter { it.enabled }
         }
-        printDevMessage("Waypoints computed for ${mode}, num: ${visibleWaypoints.size}", "waypoints")
+        printDevMessage({ "Waypoints computed for ${SBInfo.mode} (${currIsland}), num: ${visibleWaypoints.size}" }, "waypoints")
     }
 
     @SubscribeEvent

@@ -29,18 +29,17 @@ import gg.essential.vigilance.data.SortingBehavior
 import gg.skytils.skytilsmod.Reference
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.commands.impl.RepartyCommand
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
+import gg.skytils.skytilsmod.features.impl.handlers.CommandAliases
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker
 import gg.skytils.skytilsmod.gui.features.PotionNotificationsGui
+import gg.skytils.skytilsmod.gui.features.ProtectItemGui
 import gg.skytils.skytilsmod.gui.features.SpiritLeapNamesGui
-import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
 import gg.skytils.skytilsmod.utils.ModChecker
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsws.client.WSClient
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.LoaderState
 import java.awt.Color
@@ -182,6 +181,16 @@ object Config : Vigilant(
     var configButtonOnPause = true
 
     @Property(
+        type = PropertyType.SWITCH, name = "Disable Volume Overrides",
+        description = "Disables overriding your volume to play sounds at max category volume.",
+        category = "General", subcategory = "Other",
+        i18nName = "skytils.config.general.other.disable_volume_overrides",
+        i18nCategory = "skytils.config.general",
+        i18nSubcategory = "skytils.config.general.other"
+    )
+    var disableVolumeOverrides = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Reopen Options Menu",
         description = "Sets the menu to the Skytils options menu instead of exiting when on a Skytils config menu.",
         category = "General", subcategory = "Other",
@@ -190,16 +199,6 @@ object Config : Vigilant(
         i18nSubcategory = "skytils.config.general.other"
     )
     var reopenOptionsMenu = true
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Override other reparty commands",
-        description = "Uses Skytils' reparty command instead of other mods'. \n§cRequires restart to disable",
-        category = "General", subcategory = "Reparty",
-        i18nName = "skytils.config.general.reparty.override_other_reparty_commands",
-        i18nCategory = "skytils.config.general",
-        i18nSubcategory = "skytils.config.general.reparty"
-    )
-    var overrideReparty = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Coop Add Confirmation",
@@ -470,14 +469,25 @@ object Config : Vigilant(
     var showScoreCalculation = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Minimized Dungeon Score Estimate",
-        description = "Only shows the dungeon score.",
+        type = PropertyType.SELECTOR, name = "Dungeon Score Estimate Style",
+        description = "Change the style of the Score Estimate",
         category = "Dungeons", subcategory = "Score Calculation",
-        i18nName = "skytils.config.dungeons.score_calculation.minimized_dungeon_score_estimate",
+        options = ["Standard", "Minimized", "Bettermap"],
+        i18nName = "skytils.config.dungeons.score_calculation.dungeon_score_estimate_style",
         i18nCategory = "skytils.config.dungeons",
         i18nSubcategory = "skytils.config.dungeons.score_calculation"
     )
-    var minimizedScoreCalculation = false
+    var scoreCalculationStyle = 0
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Hide Score Estimate In Boss",
+        description = "Hides the score estimate when in a dungeon boss room",
+        category = "Dungeons", subcategory = "Score Calculation",
+        i18nName = "skytils.config.dungeons.score_calculation.hide_score_estimate_in_boss",
+        i18nCategory = "skytils.config.dungeons",
+        i18nSubcategory = "skytils.config.dungeons.score_calculation"
+    )
+    var hideScoreEstimateBoss = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Score Calculation Party Assist",
@@ -1282,6 +1292,17 @@ object Config : Vigilant(
     var waterBoardSolver = false
 
     @Property(
+        type = PropertyType.SELECTOR, name = "Water Board Solver Boxes",
+        description = "§b[WIP] §rDisplays the solution as boxes above the levers instead of text.",
+        category = "Dungeons", subcategory = "Solvers",
+        options = ["Text (default)", "Filled Box", "Outlined Box"],
+        i18nName = "skytils.config.dungeons.solvers.water_board_solver_boxes",
+        i18nCategory = "skytils.config.dungeons",
+        i18nSubcategory = "skytils.config.dungeons.solvers"
+    )
+    var waterBoardSolverBoxes = 0
+
+    @Property(
         type = PropertyType.SWITCH, name = "Find correct Livid",
         description = "Shows the hp of the correct livid on F5 and M5",
         category = "Dungeons", subcategory = "Solvers",
@@ -1290,16 +1311,6 @@ object Config : Vigilant(
         i18nSubcategory = "skytils.config.dungeons.solvers"
     )
     var findCorrectLivid = false
-
-    @Property(
-        type = PropertyType.SELECTOR, name = "Type of Livid Finder",
-        category = "Dungeons", subcategory = "Solvers",
-        options = ["Block Change (NEW)", "Static Block"],
-        i18nName = "skytils.config.dungeons.solvers.type_of_livid_finder",
-        i18nCategory = "skytils.config.dungeons",
-        i18nSubcategory = "skytils.config.dungeons.solvers"
-    )
-    var lividFinderType = 0
 
     @Property(
         type = PropertyType.SWITCH, name = "Boxed Tanks",
@@ -1411,6 +1422,16 @@ object Config : Vigilant(
         i18nSubcategory = "skytils.config.dungeons.terminal_solvers"
     )
     var changeToSameColorMode = 0
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Change All to Same Color Solver Lock",
+        description = "Locks the first selected target color in place.",
+        category = "Dungeons", subcategory = "Terminal Solvers",
+        i18nName = "skytils.config.dungeons.terminal_solvers.change_all_to_same_color_solver_lock",
+        i18nCategory = "skytils.config.dungeons",
+        i18nSubcategory = "skytils.config.dungeons.terminal_solvers"
+    )
+    var changeToSameColorLock = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Click in Order Solver",
@@ -2141,6 +2162,16 @@ object Config : Vigilant(
         i18nSubcategory = "skytils.config.miscellaneous.items"
     )
     var pricePaid = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Block Zapper: Left Click to Undo",
+        description = "Left clicking the block zapper will automatically run /undozap",
+        category = "Miscellaneous", subcategory = "Items",
+        i18nName = "skytils.config.miscellaneous.items.block_zapper_left_click_to_undo",
+        i18nCategory = "skytils.config.miscellaneous",
+        i18nSubcategory = "skytils.config.miscellaneous.items"
+    )
+    var blockZapperLeftClickUndo = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Disable Block Animation",
@@ -3156,6 +3187,7 @@ object Config : Vigilant(
         if (ModChecker.canShowNotifications) {
             EssentialAPI.getNotifications().push("Protect Items Help", "Hold the item you'd like to protect, and then run /protectitem.", 5f)
         } else UChat.chat("${Skytils.prefix} §bHold the item you'd like to protect, and then run /protectitem.")
+        Skytils.displayScreen = ProtectItemGui()
     }
 
     @Property(
@@ -4393,6 +4425,10 @@ object Config : Vigilant(
     var windHider = 0
 
     init {
+        registerListener("commandAliasesSpaces") { prop: Boolean ->
+            CommandAliases.recreateMap(prop)
+        }
+
         addDependency("showEtherwarpTeleportPosColor", "showEtherwarpTeleportPos")
 
         addDependency("samScytheColor", "showSamScytheBlocks")
@@ -4451,12 +4487,13 @@ object Config : Vigilant(
         addDependency("nextBlazeColor", "showNextBlaze")
         addDependency("lineToNextBlazeColor", "lineToNextBlaze")
         addDependency("teleportMazeSolverColor", "teleportMazeSolver")
+        addDependency("waterBoardSolverBoxes", "waterBoardSolver")
         addDependency("ticTacToeSolverColor", "ticTacToeSolver")
         addDependency("clickInOrderFirst", "clickInOrderTerminalSolver")
         addDependency("clickInOrderSecond", "clickInOrderTerminalSolver")
         addDependency("clickInOrderThird", "clickInOrderTerminalSolver")
         addDependency("changeToSameColorMode", "changeAllSameColorTerminalSolver")
-        addDependency("lividFinderType", "findCorrectLivid")
+        addDependency("changeToSameColorLock", "changeAllSameColorTerminalSolver")
         addDependency("predictAlignmentClicks", "alignmentTerminalSolver")
         addDependency("predictSimonClicks", "simonSaysSolver")
 
@@ -4536,18 +4573,9 @@ object Config : Vigilant(
             }
         }
 
-        registerListener("overrideReparty") { state: Boolean ->
-            if (state) {
-                (ClientCommandHandler.instance as AccessorCommandHandler).commandMap["reparty"] =
-                    RepartyCommand
-                (ClientCommandHandler.instance as AccessorCommandHandler).commandMap["rp"] =
-                    RepartyCommand
-            }
-        }
-
         registerListener("connectToWS") { state: Boolean ->
             if (state) {
-                if (mc.theWorld != null) {
+                if (mc.theWorld != null && !WSClient.connected) {
                     WSClient.openConnection()
                 }
             } else {

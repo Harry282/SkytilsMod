@@ -26,7 +26,6 @@ import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
-import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import kotlinx.coroutines.launch
@@ -41,7 +40,6 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.random.Random
 
 object BlazeSolver {
     var orderedBlazes = arrayListOf<ShootableBlaze>()
@@ -52,7 +50,7 @@ object BlazeSolver {
 
     init {
         tickTimer(4, repeats = true) {
-            if (Skytils.config.blazeSolver && Utils.inDungeons && DungeonListener.missingPuzzles.contains(
+            if (Skytils.config.blazeSolver && Utils.inDungeons && DungeonListener.incompletePuzzles.contains(
                     "Higher Or Lower"
                 )
             ) {
@@ -60,7 +58,7 @@ object BlazeSolver {
             }
         }
         tickTimer(20, repeats = true) {
-            if (Skytils.config.blazeSolver && Utils.inDungeons && DungeonListener.missingPuzzles.contains(
+            if (Skytils.config.blazeSolver && Utils.inDungeons && DungeonListener.incompletePuzzles.contains(
                     "Higher Or Lower"
                 )
             ) {
@@ -70,14 +68,14 @@ object BlazeSolver {
     }
 
     fun detectOrientation() {
-        if (blazeMode == 0 && orderedBlazes.size > 0 && mc.thePlayer != null) {
+        if (blazeMode == 0 && orderedBlazes.isNotEmpty() && mc.thePlayer != null) {
             Skytils.launch {
                 val blazes = mc.theWorld.getEntities(
                     EntityBlaze::class.java
                 ) { blaze: EntityBlaze? -> mc.thePlayer.getDistanceSqToEntity(blaze) < 100 * 100 }
                 if (blazes.size > 10) {
                     println("More than 10 blazes, was there an update?")
-                } else if (blazes.size > 0) {
+                } else if (blazes.isNotEmpty()) {
                     val diffY = 5 * (10 - blazes.size)
                     val blaze = blazes[0]
                     val blazeX = blaze.posX.toInt()
@@ -157,7 +155,6 @@ object BlazeSolver {
             }
         }
         orderedBlazes.sortWith { blaze1, blaze2 ->
-            if (SuperSecretSettings.bennettArthur) return@sortWith Random.nextInt(-1, 2)
             val compare = blaze1.health.compareTo(blaze2.health)
             if (compare == 0 && !impossible) {
                 impossible = true

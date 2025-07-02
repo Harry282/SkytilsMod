@@ -254,12 +254,12 @@ object SlayerFeatures : CoroutineScope {
 
     @SubscribeEvent
     fun onRenderLivingPre(event: RenderLivingEvent.Pre<EntityLivingBase>) {
-        if (!Utils.inSkyblock) return
+        if (!Utils.inSkyblock || !Skytils.config.slayerBossHitbox || mc.renderManager.isDebugBoundingBox) return
         if (event.entity is EntityArmorStand) {
             val entity = event.entity as EntityArmorStand
             if (!entity.hasCustomName()) return
             val name = entity.displayName.unformattedText
-            if (Skytils.config.slayerBossHitbox && name.endsWith("§c❤") && !name.endsWith("§e0§c❤") && !mc.renderManager.isDebugBoundingBox) {
+            if (name.endsWith("§c❤") && !name.endsWith("§e0§c❤")) {
                 val (x, y, z) = RenderUtil.fixRenderPos(event.x, event.y, event.z)
                 if (ZOMBIE_MINIBOSSES.any { name.contains(it) } || BLAZE_MINIBOSSES.any { name.contains(it) }) {
                     drawOutlinedBoundingBox(
@@ -325,9 +325,9 @@ object SlayerFeatures : CoroutineScope {
             }
             if (Skytils.config.totemPing != 0 && packet.entityId == (slayer as? DemonlordSlayer)?.totemEntity?.entityId) {
                 ((packet.func_149376_c()?.find { it.dataValueId == 2 } ?: return).`object` as String).let { name ->
-                    printDevMessage("totem name updating: $name", "totem")
+                    printDevMessage({ "totem name updating: $name" }, "totem")
                     totemRegex.matchEntire(name)?.run {
-                        printDevMessage("time ${groups["time"]}", "totem")
+                        printDevMessage({ "time ${groups["time"]}" }, "totem")
                         if (groups["time"]?.value?.toIntOrNull() == Skytils.config.totemPing)
                             createTitle("Totem!", 20)
                     }
@@ -360,7 +360,7 @@ object SlayerFeatures : CoroutineScope {
                 if (entity != null && entity is EntityArmorStand) {
                     val name = packet.func_149376_c()?.find { it.dataValueId == 2 }?.`object` as? String
                     if (name != null) {
-                        printDevMessage("Checking entity nametag $name, was empty ${entity.customNameTag.isEmpty()}", "slayerspam")
+                        printDevMessage({ "Checking entity nametag $name, was empty ${entity.customNameTag.isEmpty()}" }, "slayerspam")
                         if (name.startsWith("§eSpawned by: ") && name.endsWith(mc.thePlayer.name)) {
                             printDevMessage("Detected spawned text", "slayerspam", "slayer")
                             mc.theWorld.getEntitiesWithinAABBExcludingEntity(entity, entity.entityBoundingBox.expand(0.5, 0.5, 0.5)).filter {

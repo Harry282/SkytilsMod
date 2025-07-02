@@ -62,7 +62,7 @@ object SimonSaysSolver {
                         clickNeeded += 2
                     } else if (clickInOrder[clickNeeded] != pos) {
                         if (Skytils.config.blockIncorrectTerminalClicks) {
-                            printDevMessage("Prevented click on $pos", "simon")
+                            printDevMessage({ "Prevented click on $pos" }, "simon")
                             event.isCanceled = true
                         }
                     } else {
@@ -93,11 +93,11 @@ object SimonSaysSolver {
         if (Utils.inDungeons && Skytils.config.simonSaysSolver && TerminalFeatures.isInPhase3()) {
             if ((pos.y in 120..123) && pos.z in 92..95) {
                 if (pos.x == 111) {
-                    printDevMessage("Block at $pos changed to ${state.block.localizedName} from ${old.block.localizedName}", "simon")
+                    printDevMessage({ "Block at $pos changed to ${state.block.localizedName} from ${old.block.localizedName}" }, "simon")
                     if (state.block === Blocks.obsidian && old.block === Blocks.sea_lantern) {
                         if (!clickInOrder.contains(pos)) {
                             clickInOrder.add(pos)
-                        } else printDevMessage("Duplicate block at $pos", "simon")
+                        } else printDevMessage({ "Duplicate block at $pos" }, "simon")
                     }
                 } else if (pos.x == 110) {
                     if (state.block === Blocks.air) {
@@ -113,7 +113,7 @@ object SimonSaysSolver {
                         }
                     }*/
                 }
-            } else if ((pos == startBtn && state.block === Blocks.stone_button && state.getValue(BlockButtonStone.POWERED)) || Funny.ticks == 180) {
+            } else if (pos == startBtn && state.block === Blocks.stone_button && state.getValue(BlockButtonStone.POWERED)) {
                 printDevMessage("Simon says was started", "simon")
                 clickInOrder.clear()
                 clickNeeded = 0
@@ -150,7 +150,7 @@ object SimonSaysSolver {
                     matrixStack,
                     AxisAlignedBB(x, y, z, x - .13, y + .26, z + .382),
                     color,
-                    0.5f * Funny.alphaMult
+                    0.5f
                 )
             }
             GlStateManager.enableCull()

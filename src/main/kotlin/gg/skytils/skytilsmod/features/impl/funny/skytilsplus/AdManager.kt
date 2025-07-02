@@ -22,6 +22,7 @@ import gg.essential.universal.utils.MCClickEventAction
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.essential.vigilance.gui.SettingsGui
 import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
 import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.gui.PaywallGui
@@ -33,6 +34,7 @@ import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
+import gg.skytils.skytilsmod.utils.setHoverText
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -62,7 +64,7 @@ object AdManager {
 
             if (System.currentTimeMillis() - lastAdBreak > 1000 * 60) {
                 lastAdBreak = System.currentTimeMillis()
-                Utils.playLoudSound("skytils:bsmod.sparkle_adbreak", 1.0)
+                SoundQueue.addToQueue("skytils:bsmod.sparkle_adbreak", 1f, isLoud = true)
             }
         }
     }
@@ -71,7 +73,8 @@ object AdManager {
         if (!Utils.isBSMod || SkytilsPlus.redeemed) return
         tickTimer(60) {
             UTextComponent(addColor("Your play session today is powered by BSMod! Click me to try BSMod+ today for free!".toCharArray().joinToString("") { if (Random.nextDouble() > .5) it.uppercase() else it.lowercase() }, 0))
-                .setClick(MCClickEventAction.SUGGEST_COMMAND, "/bsmod+ redeem FREETRIAL").chat()
+                .setClick(MCClickEventAction.SUGGEST_COMMAND, "/bsmod+ redeem FREETRIAL")
+                .setHoverText("Redeem your free trial today! No payment method necessary.").chat()
         }
     }
 }

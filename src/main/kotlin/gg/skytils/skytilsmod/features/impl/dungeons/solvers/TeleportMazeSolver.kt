@@ -24,7 +24,6 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
-import gg.skytils.skytilsmod.features.impl.funny.Funny
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.DevTools
 import gg.skytils.skytilsmod.utils.RenderUtil
@@ -60,7 +59,7 @@ object TeleportMazeSolver {
 
     @SubscribeEvent
     fun onPacket(event: MainReceivePacketEvent<*, *>) {
-        if (!Skytils.config.teleportMazeSolver || !Utils.inDungeons || !DungeonListener.missingPuzzles.contains("Teleport Maze")) return
+        if (!Skytils.config.teleportMazeSolver || !Utils.inDungeons || !DungeonListener.incompletePuzzles.contains("Teleport Maze")) return
         if (mc.thePlayer == null || mc.theWorld == null) return
         event.packet.apply {
             when (this) {
@@ -124,7 +123,7 @@ object TeleportMazeSolver {
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (!Skytils.config.teleportMazeSolver || steppedPads.isEmpty() || !DungeonListener.missingPuzzles.contains("Teleport Maze")) return
+        if (!Skytils.config.teleportMazeSolver || steppedPads.isEmpty() || !DungeonListener.incompletePuzzles.contains("Teleport Maze")) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         val matrixStack = UMatrixStack()
 
@@ -136,8 +135,7 @@ object TeleportMazeSolver {
             RenderUtil.drawFilledBoundingBox(
                 matrixStack,
                 AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expand(0.01, 0.01, 0.01),
-                Skytils.config.teleportMazeSolverColor,
-                Funny.alphaMult
+                Skytils.config.teleportMazeSolverColor
             )
             GlStateManager.enableCull()
         }

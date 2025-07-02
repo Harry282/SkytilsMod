@@ -54,6 +54,18 @@ object MapUpdater {
         }
     }
 
+    fun updatePlayersUsingEntity() {
+        DungeonListener.team.forEach { (name, team) ->
+            team.player?.let {
+                team.mapPlayer.yaw = it.rotationYaw
+                team.mapPlayer.mapX =
+                    ((it.posX - DungeonScanner.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first).roundToInt()
+                team.mapPlayer.mapZ =
+                    ((it.posZ - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second).roundToInt()
+            }
+        }
+    }
+
     fun updateRooms(mapData: MapData) {
         DungeonMapColorParser.updateMap(mapData)
 
@@ -75,8 +87,12 @@ object MapUpdater {
 
                 if (mapTile.state.ordinal < room.state.ordinal) {
                     room.state = mapTile.state
-                    if (room is Room && room.state == RoomState.GREEN) {
-                        room.uniqueRoom?.foundSecrets = room.uniqueRoom?.foundSecrets?.coerceAtLeast(room.data.secrets)
+                    if (room is Room) {
+                        room.uniqueRoom?.state = mapTile.state
+                        if (room.state == RoomState.GREEN) {
+                            val secretThreshold = room.data.secrets
+                            room.uniqueRoom?.foundSecrets = room.uniqueRoom?.foundSecrets?.coerceAtLeast(secretThreshold) ?: secretThreshold
+                        }
                     }
                 }
 
@@ -99,11 +115,10 @@ object MapUpdater {
                             room.opened = true
                         } else if (mapTile is Door && mapTile.state == RoomState.DISCOVERED) {
                             if (room.type == DoorType.BLOOD) {
-                                val bloodRoom = DungeonInfo.uniqueRooms.find { r ->
-                                    r.mainRoom.data.type == RoomType.BLOOD
-                                }
+                                val bloodRoom = DungeonInfo.uniqueRooms["Blood"]
 
                                 if (bloodRoom != null && bloodRoom.mainRoom.state != RoomState.UNOPENED) {
+                                    assert(bloodRoom.mainRoom.data.type == RoomType.BLOOD)
                                     room.opened = true
                                 }
                             } else {

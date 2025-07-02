@@ -36,7 +36,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent
 import java.text.ParseException
-import java.text.SimpleDateFormat
+import org.apache.commons.lang3.time.FastDateFormat
 import java.util.*
 
 /**
@@ -63,6 +63,8 @@ object SBInfo {
     var lastOpenContainerName: String? = null
     private val junkRegex = Regex("[^\u0020-\u0127û]")
 
+    private val parseFormat = FastDateFormat.getInstance("hh:mm a", Locale.ROOT)
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onGuiOpen(event: GuiOpenEvent) {
         if (!Utils.inSkyblock) return
@@ -85,6 +87,7 @@ object SBInfo {
         server = null
         serverType = null
         lastLocationPacket = null
+        location = ""
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -95,6 +98,7 @@ object SBInfo {
                 server = event.packet.serverName
                 serverType = event.packet.serverType.orElse(null)
                 lastLocationPacket = event.packet
+                location = ""
                 println(event.packet)
                 LocationChangeEvent(event.packet).postAndCatch()
             }
@@ -115,7 +119,6 @@ object SBInfo {
                     time = matcher.groupValues[0].stripControlCodes().trim()
                     try {
                         val timeSpace = time.replace("am", " am").replace("pm", " pm")
-                        val parseFormat = SimpleDateFormat("hh:mm a")
                         currentTimeDate = parseFormat.parse(timeSpace)
                     } catch (_: ParseException) {
                     }
@@ -144,6 +147,7 @@ enum class SkyblockIsland(val displayName: String, val mode: String) {
     SpiderDen("Spider's Den", "combat_1"),
     CrimsonIsle("Crimson Isle", "crimson_isle"),
     TheEnd("The End", "combat_3"),
+    BackwaterBayou("Backwater Bayou", "fishing_1"),
     GoldMine("Gold Mine", "mining_1"),
     DeepCaverns("Deep Caverns", "mining_2"),
     DwarvenMines("Dwarven Mines", "mining_3"),
@@ -156,8 +160,13 @@ enum class SkyblockIsland(val displayName: String, val mode: String) {
     DarkAuction("Dark Auction", "dark_auction"),
     JerryWorkshop("Jerry's Workshop", "winter"),
     KuudraHollow("Kuudra's Hollow", "kuudra"),
+    GlaciteMineshafts("Glacite Mineshafts", "mineshaft"),
     TheRift("The Rift", "rift"),
     Unknown("(Unknown)", "");
+
+    companion object {
+        val byMode = entries.associateBy { it.mode }
+    }
 
     object ModeSerializer : KSerializer<SkyblockIsland> {
         override val descriptor: SerialDescriptor =
@@ -195,3 +204,7 @@ enum class SkyblockIsland(val displayName: String, val mode: String) {
         }
     }
 }
+
+
+/** Returns the current island based on the mode, or [SkyblockIsland.Unknown] if not found */
+val SkyblockIsland.Companion.current get() = SkyblockIsland.byMode[SBInfo.mode] ?: SkyblockIsland.Unknown

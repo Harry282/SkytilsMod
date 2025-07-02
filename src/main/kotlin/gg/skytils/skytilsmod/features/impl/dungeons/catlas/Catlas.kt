@@ -26,9 +26,11 @@ import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasBossElement
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasElement
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.*
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.dev.TopographyGenerator
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.MapUpdater
@@ -36,8 +38,12 @@ import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.MimicDetecto
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.MapUtils
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.ScanUtils
 import gg.skytils.skytilsmod.listeners.DungeonListener
+import gg.skytils.skytilsmod.listeners.DungeonListener.outboundRoomQueue
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.printDevMessage
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import net.minecraft.network.play.server.S34PacketMaps
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.world.storage.MapData
@@ -50,6 +56,12 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 object Catlas {
 
     fun reset() {
+        outboundRoomQueue.also {
+            outboundRoomQueue = Channel(UNLIMITED) {
+                printDevMessage({ "failed to deliver $it" }, "dungeonws")
+            }
+            it.cancel()
+        }
         DungeonInfo.reset()
         MapUtils.calibrated = false
         DungeonScanner.hasScanned = false
@@ -83,10 +95,22 @@ object Catlas {
         }
 
         if (CatlasConfig.mapShowBeforeStart && DungeonTimer.dungeonStartTime == -1L) {
-            ScanUtils.getRoomFromPos(mc.thePlayer.position)?.uniqueRoom?.let {
-                DungeonInfo.preStartVisitedRooms.add(it)
+            ScanUtils.getRoomFromPos(mc.thePlayer.position)?.uniqueRoom?.let { unq ->
+                if (unq.state == RoomState.PREVISITED && unq.detailedPrevisit) return@let
+
+                val chunk = mc.theWorld.getChunkFromChunkCoords(mc.thePlayer.chunkCoordX, mc.thePlayer.chunkCoordZ)
+                val isOutOfBounds = mc.thePlayer.posY < 69 || mc.thePlayer.posY > chunk.getHeight(mc.thePlayer.position)
+                unq.state = RoomState.PREVISITED
+                unq.tiles.forEach {
+                    it.state = RoomState.PREVISITED
+                }
+                if (!isOutOfBounds) unq.detailedPrevisit = true
             }
-            DungeonListener.team[mc.thePlayer.name]?.mapPlayer?.yaw = mc.thePlayer.rotationYaw
+            MapUpdater.updatePlayersUsingEntity()
+        }
+
+        if (CatlasConfig.bossMapEnabled && DungeonTimer.bossEntryTime != -1L) {
+            MapUpdater.updatePlayersUsingEntity()
         }
     }
 
@@ -99,8 +123,8 @@ object Catlas {
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Utils.inDungeons || DungeonTimer.bossEntryTime != -1L || !CatlasConfig.boxWitherDoors) return
 
-        DungeonInfo.dungeonList.filterIsInstance<Door>().filter {
-            it.type != DoorType.NORMAL && it.state == RoomState.DISCOVERED && !it.opened
+        DungeonInfo.dungeonList.filter {
+            it is Door && it.type != DoorType.NORMAL && it.state == RoomState.DISCOVERED && !it.opened
         }.forEach {
             val matrixStack = UMatrixStack()
             val aabb = AxisAlignedBB(it.x - 1.0, 69.0, it.z - 1.0, it.x + 2.0, 73.0, it.z + 2.0)
@@ -128,7 +152,7 @@ object Catlas {
 
     @SubscribeEvent
     fun onPuzzleReset(event: DungeonEvent.PuzzleEvent.Reset) {
-        val mapRoom = DungeonInfo.uniqueRooms.find { room ->
+        val mapRoom = DungeonInfo.uniqueRooms.values.find { room ->
             room.mainRoom.data.type == RoomType.PUZZLE && Puzzle.fromName(room.name)?.tabName == event.puzzle
         }
 
@@ -149,10 +173,12 @@ object Catlas {
     }
 
     init {
+        CatlasBossElement
         CatlasElement
 
         arrayOf(
             MimicDetector,
+            TopographyGenerator
         ).forEach(MinecraftForge.EVENT_BUS::register)
     }
 }

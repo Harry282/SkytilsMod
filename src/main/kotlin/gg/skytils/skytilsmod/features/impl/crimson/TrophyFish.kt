@@ -34,7 +34,7 @@ import java.util.UUID
 
 object TrophyFish {
     private val trophyFish = mutableMapOf<String, Fish>()
-    private val trophyFishRegex = Regex("TROPHY FISH! You caught an? ([\\w ]+) (BRONZE|SILVER|GOLD|DIAMOND)\\.")
+    private val trophyFishRegex = Regex("♔ TROPHY FISH! You caught an? ([\\w\\- ]+) (BRONZE|SILVER|GOLD|DIAMOND)!")
 
 
     init {
@@ -56,11 +56,11 @@ object TrophyFish {
     @SubscribeEvent
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock || SBInfo.mode != SkyblockIsland.CrimsonIsle.mode || !Config.trophyFishTracker) return
-        printDevMessage(event.message.formattedText, "trophyspam")
+        printDevMessage({ event.message.formattedText }, "trophyspam")
         trophyFishRegex.matchEntire(event.message.formattedText.stripControlCodes())?.destructured?.let { (type, tier) ->
-            printDevMessage("Found trophy fish of $type of tier $tier", "trophy")
+            printDevMessage({ "Found trophy fish of $type of tier $tier" }, "trophy")
             val fish = TrophyFish.entries.find { it.actualName.lowercase() == type.lowercase() } ?: return@let
-            printDevMessage("Trophy fish type: ${fish.name}", "trophy")
+            printDevMessage({ "Trophy fish type: ${fish.name}" }, "trophy")
             val field = when (tier.lowercase()) {
                 "diamond" -> Fish::diamond
                 "gold" -> Fish::gold
@@ -69,7 +69,7 @@ object TrophyFish {
                 else -> return@let
             }
             trophyFish[fish.name]?.let { data ->
-                printDevMessage("Updating ${fish.actualName} $tier to ${field.get(data) + 1}", "trophy")
+                printDevMessage({ "Updating ${fish.actualName} $tier to ${field.get(data) + 1}" }, "trophy")
                 field.set(data, field.get(data) + 1)
             }
         }
@@ -191,7 +191,7 @@ object TrophyFish {
         override val height: Int // This converts the boolean to an int (1 for true, 0 for false)
             get() = (TrophyFish.entries.size + Config.showTotalTrophyFish.compareTo(false)) * UGraphics.getFontHeight()
         override val width: Int
-            get() = UGraphics.getStringWidth("Steaming Hot Flounder » 999-99-99-9")
+            get() = UGraphics.getStringWidth("Steaming-Hot Flounder » 999-99-99-9")
 
     }
 }

@@ -22,12 +22,12 @@ import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.features.impl.funny.Funny
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.ifNull
+import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import net.minecraft.client.renderer.GlStateManager
@@ -50,7 +50,7 @@ object IceFillSolver {
         tickTimer(20, repeats = true) {
             if (!Utils.inDungeons || !Skytils.config.iceFillSolver || mc.thePlayer == null) return@tickTimer
             val world: World = mc.theWorld
-            if (DungeonListener.missingPuzzles.contains("Ice Fill") && puzzles == null && job?.isActive != true) {
+            if (DungeonListener.incompletePuzzles.contains("Ice Fill") && puzzles == null && job?.isActive != true) {
                 job = Skytils.launch {
                     val playerX = mc.thePlayer.posX.toInt()
                     val playerZ = mc.thePlayer.posZ.toInt()
@@ -128,7 +128,7 @@ object IceFillSolver {
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (!Utils.inDungeons || !Skytils.config.iceFillSolver || "Ice Fill" !in DungeonListener.missingPuzzles) return
+        if (!Skytils.config.iceFillSolver || !Utils.inDungeons || DungeonTimer.bossEntryTime != -1L || "Ice Fill" !in DungeonListener.incompletePuzzles) return
         val (three, five, seven) = puzzles ?: return
         val matrixStack = UMatrixStack.Compat.get()
         three.draw(matrixStack, event.partialTicks)
@@ -195,13 +195,9 @@ object IceFillSolver {
 
         fun draw(matrixStack: UMatrixStack, partialTicks: Float) {
             path?.let {
-                GlStateManager.pushMatrix()
                 GlStateManager.disableCull()
-
-                it.zipWithNext { first, second ->
-                    RenderUtil.draw3DLine(first, second, 5, Color.MAGENTA, partialTicks, matrixStack, Funny.alphaMult)
-                }
-                GlStateManager.popMatrix()
+                RenderUtil.draw3DLineStrip(it, 5, Color.MAGENTA, partialTicks, matrixStack)
+                GlStateManager.enableCull()
             }
         }
 

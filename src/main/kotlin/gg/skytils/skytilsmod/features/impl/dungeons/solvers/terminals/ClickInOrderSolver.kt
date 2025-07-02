@@ -48,7 +48,7 @@ object ClickInOrderSolver {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!Utils.inDungeons || !Skytils.config.clickInOrderTerminalSolver || event.container !is ContainerChest) return
+        if (!TerminalFeatures.isInPhase3() || !Skytils.config.clickInOrderTerminalSolver || event.container !is ContainerChest) return
         val invSlots = event.container.inventorySlots
         if (event.chestName == "Click in order!") {
             for (i in menuSlots) {
@@ -69,22 +69,22 @@ object ClickInOrderSolver {
         GlStateManager.color(1f, 1f, 1f, 1f)
         if (firstSlot != null) {
             val slot = invSlots[firstSlot]
-            if (slot != null) slot highlight Skytils.config.clickInOrderFirst.multAlpha(Funny.alphaMult)
+            if (slot != null) slot highlight Skytils.config.clickInOrderFirst
         }
         if (secondSlot != null) {
             val slot = invSlots[secondSlot]
-            if (slot != null) slot highlight Skytils.config.clickInOrderSecond.multAlpha(Funny.alphaMult)
+            if (slot != null) slot highlight Skytils.config.clickInOrderSecond
         }
         if (thirdSlot != null) {
             val slot = invSlots[thirdSlot]
-            if (slot != null) slot highlight Skytils.config.clickInOrderThird.multAlpha(Funny.alphaMult)
+            if (slot != null) slot highlight Skytils.config.clickInOrderThird
         }
         if (lightingState) GlStateManager.enableLighting()
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onDrawSlotLow(event: GuiContainerEvent.DrawSlotEvent.Pre) {
-        if (!Utils.inDungeons) return
+        if (!TerminalFeatures.isInPhase3()) return
         if (!Skytils.config.clickInOrderTerminalSolver) return
         if (event.container is ContainerChest) {
             val fr = mc.fontRendererObj
@@ -113,7 +113,7 @@ object ClickInOrderSolver {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
-        if (event.toolTip == null || !Utils.inDungeons || !Skytils.config.clickInOrderTerminalSolver) return
+        if (event.toolTip == null || !TerminalFeatures.isInPhase3() || !Skytils.config.clickInOrderTerminalSolver) return
         val chest = mc.thePlayer.openContainer
         if (chest is ContainerChest) {
             val chestName = chest.lowerChestInventory.displayName.unformattedText
