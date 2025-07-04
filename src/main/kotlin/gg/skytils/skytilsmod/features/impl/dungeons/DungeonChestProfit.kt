@@ -56,6 +56,7 @@ object DungeonChestProfit {
     private val element = DungeonChestProfitElement()
     private var rerollBypass = false
     private val essenceRegex = Regex("§d(?<type>\\w+) Essence §8x(?<count>\\d+)")
+    private val shardRegex = Regex("§.(?<type>.+) Shard §8x(?<count>\\d+)")
     private val croesusChestRegex = Regex("^(Master Mode )?The Catacombs - Flo(or (IV|V?I{0,3}))?$")
 
     @SubscribeEvent
@@ -82,8 +83,10 @@ object DungeonChestProfit {
                     val identifier = AuctionData.getIdentifier(lootSlot)
                     val value = if (identifier != null) {
                         AuctionData.lowestBINs[identifier] ?: 0.0
+                    } else if (lootSlot.displayName.contains("Essence")) {
+                        getEssenceValue(lootSlot.displayName) ?: 0.0
                     } else {
-                        getEssenceValue(lootSlot.displayName) ?: continue
+                        getShardValue(lootSlot.displayName) ?: continue
                     }
 
                     chestType.value += value
@@ -91,7 +94,11 @@ object DungeonChestProfit {
                 }
             }
             GlStateManager.pushMatrix()
-            GlStateManager.translate((-(event.gui as AccessorGuiContainer).guiLeft).toDouble(), -event.gui.guiTop.toDouble(), 299.0)
+            GlStateManager.translate(
+                (-(event.gui as AccessorGuiContainer).guiLeft).toDouble(),
+                -event.gui.guiTop.toDouble(),
+                299.0
+            )
             drawChestProfit(chestType)
             GlStateManager.popMatrix()
         } else if (croesusChestRegex.matches(event.chestName)) {
@@ -138,6 +145,7 @@ object DungeonChestProfit {
                         return
                     } else Color(255, 0, 0, 100)
                 }
+
                 lore.any { line -> line == "§8No Chests Opened!" } -> Color(0, 255, 0, 100)
                 lore.any { line -> line.startsWith("§8Opened Chest: ") } -> Color(255, 255, 0, 100)
                 else -> return
@@ -166,15 +174,25 @@ object DungeonChestProfit {
         return (AuctionData.lowestBINs["ESSENCE_$type"] ?: 0.0) * count
     }
 
+    /**
+     * While inside the chest, the shard name will display as "Wither Shard x1" while in croesus menu will only show as "Wither"
+     */
+    private fun getShardValue(text: String): Double? {
+        val groups = shardRegex.matchEntire(text)?.groups ?: return null
+        val type = groups["type"]?.value?.uppercase()?.replace(" ", "_") ?: return null
+        val count = groups["count"]?.value?.toInt() ?: return null
+        return (AuctionData.lowestBINs["SHARD_$type"] ?: 0.0) * count
+    }
+
     private fun getIdFromName(name: String): String? {
         return if (name.startsWith("§aEnchanted Book (")) {
             val enchant = name.substring(name.indexOf("(") + 1, name.indexOf(")"))
-            return enchantNameToID(enchant)
+            enchantNameToID(enchant)
         } else {
             val unformatted = name.stripControlCodes().replace("Shiny ", "")
             ItemFeatures.itemIdToNameLookup.entries.find {
                 it.value == unformatted && !it.key.contains("STARRED")
-            }?.key
+            }?.key ?: "SHARD_${unformatted.uppercase().replace(" ", "_")}"
         }
     }
 
@@ -290,9 +308,11 @@ object DungeonChestProfit {
     }
 
     private var textShadow_ = SmartFontRenderer.TextShadow.NORMAL
+
     private data class DungeonChestLootItem(var item: ItemStack, var value: Double) : Comparable<DungeonChestLootItem> {
         override fun compareTo(other: DungeonChestLootItem): Int = value.compareTo(other.value)
     }
+
     class DungeonChestProfitElement : GuiElement("Dungeon Chest Profit", x = 200, y = 120) {
         override fun render() {
             if (toggled && (Utils.inDungeons || SBInfo.mode == SkyblockIsland.DungeonHub.mode)) {
