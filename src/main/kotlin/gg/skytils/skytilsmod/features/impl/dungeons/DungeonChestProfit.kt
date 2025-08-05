@@ -185,8 +185,8 @@ object DungeonChestProfit {
     }
 
     private fun getIdFromName(name: String): String? {
-        return if (name.startsWith("§aEnchanted Book (")) {
-            val enchant = name.substring(name.indexOf("(") + 1, name.indexOf(")"))
+        return if (name.startsWith("§fEnchanted Book (")) {
+            val enchant = name.substring(name.indexOf("(") + 1, name.indexOf("§f)"))
             enchantNameToID(enchant)
         } else {
             val unformatted = name.stripControlCodes().replace("Shiny ", "")
