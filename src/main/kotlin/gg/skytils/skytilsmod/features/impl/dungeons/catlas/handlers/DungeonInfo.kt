@@ -18,7 +18,10 @@
 
 package gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers
 
-import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.*
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.Puzzle
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.Tile
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.UniqueRoom
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.Unknown
 import net.minecraft.world.storage.MapData
 
 object DungeonInfo {

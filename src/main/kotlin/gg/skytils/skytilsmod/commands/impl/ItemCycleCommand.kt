@@ -189,7 +189,9 @@ object ItemCycleCommand {
         PersistentSave.markDirty<ItemCycle>()
 
         val negationText = if (negated) " (Not Active)" else ""
-        val typeDesc = when(type) { 0 -> "Press"; 1 -> "Release"; 2 -> "Held"; else -> "Unknown Type"}
+        val typeDesc = when (type) {
+            0 -> "Press"; 1 -> "Release"; 2 -> "Held"; else -> "Unknown Type"
+        }
         UChat.chat(
             UTextComponent("$successPrefix §fAdded Click condition${negationText} (Button $button, Type $typeDesc) to cycle '${cycle.name}'.")
             .appendSibling(

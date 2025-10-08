@@ -24,7 +24,7 @@ import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.CoroutineScope
 import org.brotli.dec.BrotliInputStream
 
-object BrotliEncoder: ContentEncoder {
+object BrotliEncoder : ContentEncoder {
     override val name: String = "br"
 
     override fun CoroutineScope.decode(source: ByteReadChannel): ByteReadChannel {
@@ -36,5 +36,6 @@ object BrotliEncoder: ContentEncoder {
         ).toByteReadChannel()
     }
 
-    override fun CoroutineScope.encode(source: ByteReadChannel): ByteReadChannel = throw UnsupportedOperationException("Cannot encode Brotli")
+    override fun CoroutineScope.encode(source: ByteReadChannel): ByteReadChannel =
+        throw UnsupportedOperationException("Cannot encode Brotli")
 }

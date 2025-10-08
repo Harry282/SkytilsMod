@@ -110,6 +110,7 @@ open class VanillaEditingGui : GuiScreen(), ReopenableGUI {
                 it.element.setPos(10, 10)
                 it.element.scale = 1f
             }
+
             2 -> buttonList.filterIsInstance<LocationButton>().filter { it.mousePressed(mc, mouseX, mouseY) }.forEach {
                 it.element.textShadow = SmartFontRenderer.TextShadow.entries[(it.element.textShadow.ordinal + 1) % SmartFontRenderer.TextShadow.entries.size]
             }

@@ -21,7 +21,6 @@ package gg.skytils.skytilsmod.features.impl.dungeons.catlas.core
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.player.EnumPlayerModelParts
-import net.minecraft.util.ResourceLocation
 
 data class DungeonMapPlayer(val teammate: DungeonListener.DungeonTeammate) {
     inline val skin get() = teammate.skin

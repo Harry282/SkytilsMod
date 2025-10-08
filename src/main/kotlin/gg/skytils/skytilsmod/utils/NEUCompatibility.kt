@@ -50,9 +50,11 @@ object NEUCompatibility {
                                 nameRange.first -> {
                                     event.parameters[newIndex] = "\"" + event.parameters[i]
                                 }
+
                                 nameRange.last -> {
                                     event.parameters[newIndex] = event.parameters[i] + "\""
                                 }
+
                                 else -> {
                                     event.parameters[newIndex] = event.parameters[i]
                                 }

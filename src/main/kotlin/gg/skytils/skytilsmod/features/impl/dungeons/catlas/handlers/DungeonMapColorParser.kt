@@ -30,6 +30,7 @@ object DungeonMapColorParser {
 
     var halfRoom = -1
     var halfTile = -1
+
     // connectorSize
     var quarterRoom = -1
     var startX = -1

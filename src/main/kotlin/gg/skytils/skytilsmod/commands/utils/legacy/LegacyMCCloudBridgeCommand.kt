@@ -31,7 +31,7 @@ import org.incendo.cloud.exception.CommandExecutionException
 import org.incendo.cloud.exception.CommandParseException
 import java.util.concurrent.CompletionException
 
-class LegacyMCCloudBridgeCommand(val command: Command<SkytilsCommandSender>): CommandBase() {
+class LegacyMCCloudBridgeCommand(val command: Command<SkytilsCommandSender>) : CommandBase() {
     override fun getCommandName(): String = command.rootComponent().name()
 
     override fun getCommandUsage(sender: ICommandSender): String = "/$commandName"
@@ -49,13 +49,16 @@ class LegacyMCCloudBridgeCommand(val command: Command<SkytilsCommandSender>): Co
                 is CommandException -> {
                     throw CommandExceptionWrapper(exception, "$failPrefix §c${exception.message} ($input)")
                 }
+
                 is CommandParseException -> {
                     throw CommandExceptionWrapper(exception, "$failPrefix §cFailed to parse $input: ${exception::class.java.simpleName} ${exception.message}")
                 }
+
                 is CommandExecutionException -> {
                     exception.printStackTrace()
                     throw CommandExceptionWrapper(exception, "$failPrefix §cFailed to execute $input: ${exception.message}")
                 }
+
                 else -> {
                     exception.printStackTrace()
                     throw CommandExceptionWrapper(exception, "$failPrefix §cAn error occurred while executing the command. See logs for more details. ($input)")

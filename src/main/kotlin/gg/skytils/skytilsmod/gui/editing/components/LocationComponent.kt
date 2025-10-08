@@ -54,9 +54,11 @@ class LocationComponent(val element: GuiElement) : UIComponent() {
                         height = element.scaleHeight.pixels
                     }
                 }
+
                 2 -> {
                     element.textShadow = SmartFontRenderer.TextShadow.entries[(element.textShadow.ordinal + 1) % SmartFontRenderer.TextShadow.entries.size]
                 }
+
                 else -> {
                     constrain {
                         x = MousePositionConstraint() - event.relativeX.pixels

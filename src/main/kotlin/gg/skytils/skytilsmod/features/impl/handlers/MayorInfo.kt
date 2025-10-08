@@ -17,7 +17,6 @@
  */
 package gg.skytils.skytilsmod.features.impl.handlers
 
-import com.mojang.authlib.exceptions.AuthenticationException
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.client
 import gg.skytils.skytilsmod.Skytils.Companion.json
@@ -25,12 +24,14 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
-import gg.skytils.skytilsmod.utils.*
+import gg.skytils.skytilsmod.utils.ItemUtil
+import gg.skytils.skytilsmod.utils.TabListUtils
+import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.stripControlCodes
 import gg.skytils.skytilsws.client.WSClient
 import gg.skytils.skytilsws.shared.packet.C2SPacketJerryVote
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
@@ -39,10 +40,7 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.io.IOException
-import java.util.*
 import kotlin.math.abs
-import kotlin.math.round
 import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes

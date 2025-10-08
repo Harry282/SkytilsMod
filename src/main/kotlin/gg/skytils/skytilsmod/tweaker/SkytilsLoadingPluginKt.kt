@@ -42,7 +42,7 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
 import java.net.URL
-import javax.swing.*
+import javax.swing.JButton
 
 /**
  * Fake loading plugin, called from the java loading plugin

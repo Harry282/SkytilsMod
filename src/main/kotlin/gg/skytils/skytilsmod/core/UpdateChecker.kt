@@ -43,7 +43,10 @@ import net.minecraftforge.fml.common.versioning.DefaultArtifactVersion
 import java.io.File
 import java.io.PrintStream
 import java.nio.file.StandardCopyOption
-import kotlin.io.path.*
+import kotlin.io.path.Path
+import kotlin.io.path.copyTo
+import kotlin.io.path.exists
+import kotlin.io.path.moveTo
 
 object UpdateChecker {
     val updateGetter = UpdateGetter()

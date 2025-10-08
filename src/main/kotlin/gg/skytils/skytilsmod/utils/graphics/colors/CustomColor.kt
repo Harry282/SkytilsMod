@@ -27,6 +27,8 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import net.minecraft.client.renderer.GlStateManager
 import org.apache.commons.codec.digest.DigestUtils
+import org.checkerframework.checker.units.qual.g
+import scala.collection.immutable.`StringLike$class`.r
 
 /** CustomColor
  * will represent color or complex colors
@@ -98,15 +100,9 @@ open class CustomColor {
             val greenc = (cmax - g) / (cmax - cmin)
             val bluec = (cmax - b) / (cmax - cmin)
             hue = when {
-                r == cmax -> {
-                    bluec - greenc
-                }
-                g == cmax -> {
-                    2.0f + redc - bluec
-                }
-                else -> {
-                    4.0f + greenc - redc
-                }
+                r == cmax -> bluec - greenc
+                g == cmax -> 2.0f + redc - bluec
+                else -> 4.0f + greenc - redc
             }
             hue /= 6.0f
             if (hue < 0) {
@@ -179,6 +175,7 @@ open class CustomColor {
                     } catch (ignored: Exception) {
                     }
                 }
+
                 3 -> {
                     // "rgb" -> "rrggbb"
                     try {
@@ -190,6 +187,7 @@ open class CustomColor {
                     } catch (ignored: Exception) {
                     }
                 }
+
                 2 -> {
                     // "vv" -> "vvvvvv"
                     try {

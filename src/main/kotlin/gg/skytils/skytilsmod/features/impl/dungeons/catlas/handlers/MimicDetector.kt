@@ -25,7 +25,6 @@ import gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation
 import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsws.client.WSClient
-import gg.skytils.skytilsws.shared.SkytilsWS
 import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonMimic
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.init.Blocks

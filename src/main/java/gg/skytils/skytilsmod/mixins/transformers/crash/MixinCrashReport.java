@@ -35,31 +35,30 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(value = CrashReport.class, priority = 988)
 public abstract class MixinCrashReport {
 
+    @Unique
+    private final CrashReportHook skytilsMod$hook = new CrashReportHook((CrashReport) (Object) this);
     @Shadow
     @Final
     private CrashReportCategory theReportCategory;
 
-    @Unique
-    private final CrashReportHook hook = new CrashReportHook((CrashReport) (Object) this);
-
     @Inject(method = "getCompleteReport", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;", shift = At.Shift.AFTER, remap = false, ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
     private void thereIsNoOtherWay(CallbackInfoReturnable<String> cir, StringBuilder stringbuilder) {
-        hook.checkSkytilsCrash(cir, stringbuilder);
+        skytilsMod$hook.checkSkytilsCrash(cir, stringbuilder);
     }
 
     @ModifyArg(method = "getCompleteReport", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;", remap = false, ordinal = 10))
     private String otherReplaceCauseForLauncher(String theCauseStackTraceOrString) {
-        return hook.generateCauseForLauncher(theCauseStackTraceOrString);
+        return skytilsMod$hook.generateCauseForLauncher(theCauseStackTraceOrString);
     }
 
     @ModifyArg(method = "getCompleteReport", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;", ordinal = 2, remap = false, args = "matches=method::getWittyComment"))
     private String replaceWittyComment(String comment) {
-        return hook.generateWittyComment(comment);
+        return skytilsMod$hook.generateWittyComment(comment);
     }
 
 
     @Inject(method = "populateEnvironment", at = @At("RETURN"))
     private void addDataToCrashReport(CallbackInfo ci) {
-        hook.addDataToCrashReport(this.theReportCategory);
+        skytilsMod$hook.addDataToCrashReport(this.theReportCategory);
     }
 }

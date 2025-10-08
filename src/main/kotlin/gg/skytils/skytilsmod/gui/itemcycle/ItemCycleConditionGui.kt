@@ -33,7 +33,10 @@ import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
 import gg.skytils.skytilsmod.features.impl.handlers.ItemCycle
 import gg.skytils.skytilsmod.gui.components.SimpleButton
-import gg.skytils.skytilsmod.gui.itemcycle.condition.*
+import gg.skytils.skytilsmod.gui.itemcycle.condition.ClickConditionGui
+import gg.skytils.skytilsmod.gui.itemcycle.condition.IslandConditionGui
+import gg.skytils.skytilsmod.gui.itemcycle.condition.ItemConditionGui
+import gg.skytils.skytilsmod.gui.itemcycle.condition.SlotConditionGui
 import net.minecraft.client.gui.GuiScreen
 import java.awt.Color
 

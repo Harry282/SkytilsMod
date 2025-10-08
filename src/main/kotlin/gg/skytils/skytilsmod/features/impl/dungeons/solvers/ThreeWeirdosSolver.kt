@@ -68,7 +68,7 @@ object ThreeWeirdosSolver {
                 mc.theWorld?.loadedEntityList?.find {
                     it is EntityArmorStand && riddleNPC!! in it.customNameTag
                 }?.let {
-                    riddleChest = EnumFacing.HORIZONTALS.map { dir -> it.position.offset(dir)  }.find {
+                    riddleChest = EnumFacing.HORIZONTALS.map { dir -> it.position.offset(dir) }.find {
                         mc.theWorld?.getBlockState(it)?.block == Blocks.chest
                     }
                     println("Riddle NPC ${it.customNameTag} @ ${it.position} w/ chest @ $riddleChest")

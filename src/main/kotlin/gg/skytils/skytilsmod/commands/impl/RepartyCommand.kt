@@ -83,7 +83,7 @@ object RepartyCommand {
                     if (repartyFailList.size > 0) {
                         val repartyFails = repartyFailList.joinToString(
                             separator =
-                            """
+                                """
     
     - §c
     """.trimIndent()
@@ -121,7 +121,7 @@ object RepartyCommand {
                 }
                 val members = party.joinToString(
                     separator =
-                    """
+                        """
     §f
     - §e
     """.trimIndent()
@@ -149,7 +149,7 @@ object RepartyCommand {
                 if (repartyFailList.size > 0) {
                     val repartyFails = repartyFailList.joinToString(
                         separator =
-                        """
+                            """
     
     - §c
     """.trimIndent(),

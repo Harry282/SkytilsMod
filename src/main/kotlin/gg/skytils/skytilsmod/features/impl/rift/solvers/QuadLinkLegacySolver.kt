@@ -39,7 +39,7 @@ object QuadLinkLegacySolver {
 
     // he takes up the middle 7 slots for each row of the chest
     // this is [row][column]
-    val boardSlots = (0 until 6).map { it*9+1..it*9+7 }
+    val boardSlots = (0 until 6).map { it * 9 + 1..it * 9 + 7 }
     val flatBoardSlots = boardSlots.flatten()
 
     var ourItem: ItemStack? = null
@@ -124,15 +124,15 @@ object QuadLinkLegacySolver {
     }
 
     /**
-      * board[column][row]
-      * boolean? = null if empty, true if our piece, false if opponent's piece
+     * board[column][row]
+     * boolean? = null if empty, true if our piece, false if opponent's piece
      */
     val board: Array<Array<Boolean?>> = Array(7) { arrayOfNulls(6) }
 
     /**
      * Makes a move in Connect 4
      * @return If the move was successful
-    */
+     */
     fun makeMove(column: Int, ourPiece: Boolean): Boolean {
         check(column in 0 until 7) { "Column must be between 0 and 6" }
         board[column].forEachIndexed { index, b ->
@@ -147,7 +147,7 @@ object QuadLinkLegacySolver {
     /**
      * Removes the top piece on a column in Connect 4
      * @return If the move was successful
-    */
+     */
     fun popMove(column: Int): Boolean {
         check(column in 0 until 7) { "Column must be between 0 and 6" }
         for (row in 5 downTo 0) {
@@ -161,8 +161,8 @@ object QuadLinkLegacySolver {
 
 
     /**
-    * @return true if we won, false if opponent won, null if no one won
-    */
+     * @return true if we won, false if opponent won, null if no one won
+     */
     fun getWinner(): Boolean? {
         // Check horizontal
         for (row in 0 until 6) {

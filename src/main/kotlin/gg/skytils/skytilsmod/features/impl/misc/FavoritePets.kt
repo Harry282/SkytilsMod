@@ -26,7 +26,6 @@ import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.toStringIfTrue
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.inventory.GuiChest

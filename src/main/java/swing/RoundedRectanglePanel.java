@@ -34,7 +34,7 @@ public class RoundedRectanglePanel extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
-        Dimension arcs = new Dimension(rw,rh); //Border corners arcs {width,height}, change this to whatever you want
+        Dimension arcs = new Dimension(rw, rh); //Border corners arcs {width,height}, change this to whatever you want
         int width = getPreferredSize().width;
         int height = getPreferredSize().height;
         Graphics2D graphics = (Graphics2D) g;

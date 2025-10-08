@@ -18,7 +18,8 @@
 
 package gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.boss
 
-import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.boss.icons.*
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.boss.icons.PlayerIconRenderer
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.boss.icons.TerminalIconRenderer
 import net.minecraft.util.ResourceLocation
 
 val BossMaps = hashMapOf(

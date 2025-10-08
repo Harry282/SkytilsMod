@@ -55,9 +55,11 @@ object NamespacedCommands {
                 is ObservableAddEvent<*> -> {
                     registerCommandHelper(arg.element as ICommand)
                 }
+
                 is ObservableRemoveEvent<*> -> {
                     cch.commandMap.remove(aliasMap.remove(arg.element))
                 }
+
                 is ObservableClearEvent<*> -> {
                     aliasMap.entries.removeAll {
                         cch.commandMap.remove(it.value)
@@ -84,14 +86,14 @@ object NamespacedCommands {
         val owner = owners.firstOrNull()
 
         val prefix = owner?.modId ?: owner?.name ?: "unknown"
-        
+
         val helper = "${prefix}:${command.commandName}"
         cch.commandMap[helper] = command
 
         aliasMap[command] = helper
     }
 
-    fun getCommandModOwner(command: Class<*>) : List<ModContainer> {
+    fun getCommandModOwner(command: Class<*>): List<ModContainer> {
         val idx = command.name.lastIndexOf(".")
         if (idx == -1) return emptyList()
         val packageName = command.name.substring(0, idx)

@@ -18,8 +18,6 @@
 
 package gg.skytils.skytilsmod.gui.view
 
-import gg.essential.elementa.state.BasicState
-import gg.essential.elementa.state.MappedState
 import gg.essential.elementa.state.State
 import gg.skytils.skytilsmod.core.mcScope
 import kotlinx.coroutines.CoroutineScope

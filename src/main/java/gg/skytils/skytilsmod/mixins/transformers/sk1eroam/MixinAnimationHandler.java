@@ -18,7 +18,6 @@
 
 package gg.skytils.skytilsmod.mixins.transformers.sk1eroam;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import gg.skytils.skytilsmod.mixins.hooks.renderer.ItemRendererHookKt;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.EnumAction;

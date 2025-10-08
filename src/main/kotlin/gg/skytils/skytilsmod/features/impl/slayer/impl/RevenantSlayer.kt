@@ -87,6 +87,7 @@ class RevenantSlayer(entity: EntityZombie) :
                     }
                 }
             }
+
         private var rev5PingTask = createrev5PingTask()
     }
 }

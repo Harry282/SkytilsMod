@@ -82,7 +82,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import java.awt.Color
-import kotlin.math.min
 import kotlin.math.pow
 
 object ItemFeatures {
@@ -418,7 +417,7 @@ object ItemFeatures {
 
         if (Skytils.config.showItemQuality && extraAttr != null) {
             val boost = extraAttr.getInteger("baseStatBoostPercentage")
-            
+
             if (boost > 0) {
                 val tier = extraAttr.getInteger("item_tier")
 
@@ -428,7 +427,7 @@ object ItemFeatures {
                     val (dungeon, level) = req.split(':', limit = 2)
                     val levelReq = level.toIntOrNull() ?: 0
                     if (dungeon == "CATACOMBS") {
-                        if (levelReq - tier > 19) "§4M${tier-3}" else "§aF$tier"
+                        if (levelReq - tier > 19) "§4M${tier - 3}" else "§aF$tier"
                     } else {
                         "§b${dungeon} $tier"
                     }
@@ -475,8 +474,6 @@ object ItemFeatures {
             }
             if (this is S2FPacketSetSlot && func_149175_c() == 0) {
                 if (mc.thePlayer == null || (!Utils.inSkyblock && mc.thePlayer.ticksExisted > 1)) return
-                val slot = func_149173_d()
-
                 val item = func_149174_e() ?: return
                 val extraAttr = getExtraAttributes(item) ?: return
                 val itemId = getSkyBlockItemID(extraAttr) ?: return
@@ -558,7 +555,6 @@ object ItemFeatures {
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
         val item = event.stack ?: return
         if (!Utils.inSkyblock || item.stackSize != 1 || item.tagCompound?.hasKey("SkytilsNoItemOverlay") == true) return
-        val matrixStack = UMatrixStack()
         var stackTip = ""
         val lore = getItemLore(item).takeIf { it.isNotEmpty() }
         getExtraAttributes(item)?.let { extraAttributes ->
@@ -586,12 +582,12 @@ object ItemFeatures {
                         val prefix: String = if (enchant != null) {
                             val parts = enchant.loreName.split(" ")
                             val joined = if (parts.size > 1) parts.joinToString("") { it[0].uppercase() }
-                                else if (parts.first().startsWith("Turbo-")) "${
-                                    parts.first().split("-")[1].take(3).toTitleCase()
-                                }."
-                                else "${
-                                    parts.first().take(3).toTitleCase()
-                                }."
+                            else if (parts.first().startsWith("Turbo-")) "${
+                                parts.first().split("-")[1].take(3).toTitleCase()
+                            }."
+                            else "${
+                                parts.first().take(3).toTitleCase()
+                            }."
                             if (enchant.nbtName.startsWith("ultimate")) {
                                 "§d§l${joined}"
                             } else joined

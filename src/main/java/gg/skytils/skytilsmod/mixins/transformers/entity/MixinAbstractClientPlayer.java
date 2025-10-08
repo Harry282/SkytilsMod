@@ -32,12 +32,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractClientPlayer.class)
 public abstract class MixinAbstractClientPlayer extends EntityPlayer {
+    @Unique
+    private final AbstractClientPlayerHook hook = new AbstractClientPlayerHook(this);
+
     public MixinAbstractClientPlayer(World worldIn, GameProfile gameProfileIn) {
         super(worldIn, gameProfileIn);
     }
-
-    @Unique
-    private final AbstractClientPlayerHook hook = new AbstractClientPlayerHook(this);
 
     @Inject(method = "getLocationSkin()Lnet/minecraft/util/ResourceLocation;", at = @At("RETURN"), cancellable = true)
     private void replaceSkin(CallbackInfoReturnable<ResourceLocation> cir) {

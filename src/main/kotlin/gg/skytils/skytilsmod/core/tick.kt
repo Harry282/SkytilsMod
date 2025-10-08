@@ -56,7 +56,7 @@ fun <T> tickTask(ticks: Int, repeats: Boolean = false, task: () -> T) =
                 task()
             })
         } while (repeats)
-    }.catch {e ->
+    }.catch { e ->
         if (e is RuntimeException) {
             e.printStackTrace()
             UChat.chat("${Skytils.failPrefix} §cSkytils ${Skytils.VERSION} caught and logged an ${e::class.simpleName ?: "error"} on a tick task. Please report this on the Discord server at discord.gg/skytils.")

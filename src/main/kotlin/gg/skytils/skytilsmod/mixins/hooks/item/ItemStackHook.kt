@@ -23,7 +23,6 @@ import gg.skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import gg.skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.countMatches
-import gg.skytils.skytilsmod.utils.ifNull
 import net.minecraft.item.ItemStack
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
@@ -76,7 +75,8 @@ fun modifyDisplayName(displayName: String): String {
                 } ?: return displayName.replace(starRegex, "") + "§6${displayName.countMatches(star)}$star"
             }
         }
-    } catch (ignored: Exception) { }
+    } catch (ignored: Exception) {
+    }
 
     return displayName
 }

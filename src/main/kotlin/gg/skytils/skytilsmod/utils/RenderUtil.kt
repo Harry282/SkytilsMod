@@ -763,21 +763,21 @@ object RenderUtil {
     /**
      * Helper method for fixRenderPos
      */
-    fun getRenderX() : Double {
+    fun getRenderX(): Double {
         return (mc.renderManager as AccessorRenderManager).renderX
     }
 
     /**
      * Helper method for fixRenderPos
      */
-    fun getRenderY() : Double {
+    fun getRenderY(): Double {
         return (mc.renderManager as AccessorRenderManager).renderY
     }
 
     /**
      * Helper method for fixRenderPos
      */
-    fun getRenderZ() : Double {
+    fun getRenderZ(): Double {
         return (mc.renderManager as AccessorRenderManager).renderZ
     }
 
@@ -786,7 +786,7 @@ object RenderUtil {
      *
      * Working particularly well in RenderLivingEvent.Pre/Post<*>
      */
-    fun fixRenderPos(x: Double, y: Double, z: Double, invert: Boolean = false) : Triple<Double, Double, Double> {
+    fun fixRenderPos(x: Double, y: Double, z: Double, invert: Boolean = false): Triple<Double, Double, Double> {
         return Triple(x + getRenderX(), y + getRenderY(), z + getRenderZ())
     }
 

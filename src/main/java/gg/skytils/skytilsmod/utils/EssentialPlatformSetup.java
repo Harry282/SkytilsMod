@@ -28,7 +28,8 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.URI;
 
-import static gg.skytils.skytilsmod.tweaker.TweakerUtil.*;
+import static gg.skytils.skytilsmod.tweaker.TweakerUtil.makeRequest;
+import static gg.skytils.skytilsmod.tweaker.TweakerUtil.showMessage;
 
 public class EssentialPlatformSetup {
     private static final String[] dataURLCandidates = {System.getProperty("skytils.dataURL"), Reference.dataUrl, "https://skytilsmod-data.pages.dev/", "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/", "https://mirror.ghproxy.com/https://raw.githubusercontent.com/Skytils/SkytilsMod-Data/main/"};
@@ -80,7 +81,7 @@ public class EssentialPlatformSetup {
                 });
 
                 showMessage("<html><p>" +
-                        "Your version of Skytils (" + Reference.VERSION  + ") requires a<br>" +
+                        "Your version of Skytils (" + Reference.VERSION + ") requires a<br>" +
                         "mandatory update before you can play!<br>" +
                         "Please download the latest version,<br>" +
                         "join the Discord for support.<br>" +

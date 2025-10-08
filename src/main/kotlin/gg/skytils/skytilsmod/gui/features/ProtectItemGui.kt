@@ -46,7 +46,6 @@ import gg.skytils.skytilsmod.gui.profile.components.WardrobeComponent
 import gg.skytils.skytilsmod.utils.ItemUtil
 import net.minecraft.item.ItemStack
 import java.awt.Color
-import kotlin.collections.forEach
 
 class ProtectItemGui : WindowScreen(ElementaVersion.V2, newGuiScale = EssentialAPI.Companion.getGuiUtil().getGuiScale()) {
 

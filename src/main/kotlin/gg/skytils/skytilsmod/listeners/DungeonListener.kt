@@ -116,11 +116,12 @@ object DungeonListener {
     private val deathRegex = Regex("§r§c ☠ §r§7(?:You were |(?:§.)+(?<username>\\w+)§r)(?<reason>.*) and became a ghost§r§7\\.§r")
     private val reconnectedRegex = Regex("§r§c ☠ §r§7(?:§.)+(?<username>\\w+) §r§7reconnected§r§7.§r")
     private val reviveRegex = Regex("^§r§a ❣ §r§7(?:§.)+(?<username>\\w+)§r§a was revived")
-    private val secretsRegex = Regex("\\s*§7(?<secrets>\\d+)\\/(?<maxSecrets>\\d+) Secrets")
+    private val secretsRegex = Regex("\\s*§7(?<secrets>\\d+)/(?<maxSecrets>\\d+) Secrets")
     private val keyPickupRegex = Regex("§r§e§lRIGHT CLICK §r§7on §r§7.+?§r§7 to open it\\. This key can only be used to open §r§a(?<num>\\d+)§r§7 door!§r")
     private val witherDoorOpenedRegex = Regex("^(?:\\[.+?] )?(?<name>\\w+) opened a WITHER door!$")
     private const val bloodOpenedString = "§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r"
     var outboundRoomQueue = Channel<C2SPacketDungeonRoom>(UNLIMITED)
+
     // 1 + i * 4
     private val playerEntryNames = mapOf("!A-b" to 1, "!A-f" to 5, "!A-j" to 9, "!A-n" to 13, "!A-r" to 17)
 
@@ -149,7 +150,7 @@ object DungeonListener {
                     DungeonFeatures.DungeonSecretDisplay.secrets = sec
                     DungeonFeatures.DungeonSecretDisplay.maxSecrets = max
 
-                    run setFoundSecrets@ {
+                    run setFoundSecrets@{
                         val tile = ScanUtils.getRoomFromPos(mc.thePlayer.position)
                         if (tile is Room && tile.data.name != "Unknown") {
                             val room = tile.uniqueRoom ?: return@setFoundSecrets
@@ -255,8 +256,7 @@ object DungeonListener {
                     }
                 }
             }
-        }
-        else if (event.packet is S38PacketPlayerListItem && DungeonTimer.scoreShownAt == -1L) {
+        } else if (event.packet is S38PacketPlayerListItem && DungeonTimer.scoreShownAt == -1L) {
             val action = event.packet.action
             val entries = event.packet.entries
 

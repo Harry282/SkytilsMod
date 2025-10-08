@@ -24,7 +24,6 @@ import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.utils.*
 import kotlinx.serialization.Contextual
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.event.entity.player.ItemTooltipEvent

@@ -22,11 +22,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures.dungeonFloorNumber
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
-import gg.skytils.skytilsmod.utils.ItemUtil
-import gg.skytils.skytilsmod.utils.SuperSecretSettings
-import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.startsWithAny
-import gg.skytils.skytilsmod.utils.stripControlCodes
+import gg.skytils.skytilsmod.utils.*
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -36,7 +32,7 @@ object TerminalFeatures {
 
     fun isInPhase3(): Boolean {
         return ((SuperSecretSettings.azooPuzzoo || DungeonTimer.phase2ClearTime != -1L) &&
-                        DungeonTimer.terminalClearTime == -1L && dungeonFloorNumber == 7)
+                DungeonTimer.terminalClearTime == -1L && dungeonFloorNumber == 7)
                 || (SuperSecretSettings.azooPuzzoo && ItemUtil.getSkyBlockItemID(mc.thePlayer?.heldItem) == "PUZZLE_CUBE")
     }
 

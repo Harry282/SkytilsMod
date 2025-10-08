@@ -27,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(targets = "net.minecraft.network.PacketThreadUtil$1")
 public abstract class MixinPacketThreadUtil<T extends INetHandler> implements Runnable {
-    @WrapWithCondition(method="run", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/Packet;processPacket(Lnet/minecraft/network/INetHandler;)V"))
+    @WrapWithCondition(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/Packet;processPacket(Lnet/minecraft/network/INetHandler;)V"))
     private boolean processMainThreadPacket(Packet<T> packet, T netHandler) {
         return !(new MainReceivePacketEvent<>(
                 netHandler,

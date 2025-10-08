@@ -293,7 +293,7 @@ object SkillUtils {
     }
 
     val gg.skytils.hypixel.types.skyblock.Pet.level: Int
-        get () {
+        get() {
             val offset = petRarityOffset[tier] ?: 0
             val maxLevel = if (type == "GOLDEN_DRAGON") 200 else 100
             val levels = petLevels.sliceArray(offset..< offset + maxLevel - 1)

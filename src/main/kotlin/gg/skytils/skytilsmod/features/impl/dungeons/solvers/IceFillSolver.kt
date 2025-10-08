@@ -22,12 +22,12 @@ import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.tickTimer
+import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.ifNull
-import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import net.minecraft.client.renderer.GlStateManager
@@ -64,7 +64,8 @@ object IceFillSolver {
                                 for (direction in EnumFacing.HORIZONTALS) {
                                     if (world.getBlockState(pos.offset(direction)).block == Blocks.cobblestone && world.getBlockState(
                                             pos.offset(direction.opposite, 2)
-                                        ).block == Blocks.iron_bars) {
+                                        ).block == Blocks.iron_bars
+                                    ) {
 
                                         val offsetDir = listOf(direction.rotateYCCW(), direction.rotateY()).find {
                                             return@find world.getBlockState(
@@ -84,7 +85,8 @@ object IceFillSolver {
                                                 pos.offset(direction.opposite)
                                                     .offset(offsetDir)
                                                     .down(2)
-                                            ).block == Blocks.stone_brick_stairs) {
+                                            ).block == Blocks.stone_brick_stairs
+                                        ) {
                                             //chestCenter: -11 75 -89; direction: east
                                             val chestCenter = pos.offset(offsetDir)
 

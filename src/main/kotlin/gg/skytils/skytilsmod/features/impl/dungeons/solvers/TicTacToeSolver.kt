@@ -150,7 +150,7 @@ object TicTacToeSolver {
         for (frame in frames) {
             val (row, column) = getBoardPosition(frame)
             if (board == null) {
-                topLeft = frame.position.up(row-1).offset(frame.facingDirection.rotateY(), column)
+                topLeft = frame.position.up(row - 1).offset(frame.facingDirection.rotateY(), column)
                 roomFacing = frame.facingDirection.opposite
                 board = Board()
             }

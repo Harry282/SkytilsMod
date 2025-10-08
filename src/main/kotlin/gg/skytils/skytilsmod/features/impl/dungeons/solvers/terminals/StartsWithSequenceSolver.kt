@@ -21,7 +21,6 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
-import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
@@ -73,6 +72,7 @@ object StartsWithSequenceSolver {
                 if (event.packet.func_149175_c() != windowId) return
                 handleItemStack(event.packet.func_149173_d(), event.packet.func_149174_e())
             }
+
             is S30PacketWindowItems -> {
                 if (event.packet.func_148911_c() != windowId) return
                 event.packet.itemStacks.forEachIndexed(::handleItemStack)
@@ -93,7 +93,7 @@ object StartsWithSequenceSolver {
 
     @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
-        if (!TerminalFeatures.isInPhase3()|| !Skytils.config.startsWithSequenceTerminalSolver) return
+        if (!TerminalFeatures.isInPhase3() || !Skytils.config.startsWithSequenceTerminalSolver) return
         if (event.container is ContainerChest && event.chestName.startsWith("What starts with:")) {
             val slot = event.slot
             if (shouldClick.size > 0 && !shouldClick.contains(slot.slotNumber) && slot.inventory !== mc.thePlayer.inventory) {
@@ -112,7 +112,7 @@ object StartsWithSequenceSolver {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
-        if (event.toolTip == null || !TerminalFeatures.isInPhase3()|| !Skytils.config.startsWithSequenceTerminalSolver) return
+        if (event.toolTip == null || !TerminalFeatures.isInPhase3() || !Skytils.config.startsWithSequenceTerminalSolver) return
         val container = mc.thePlayer?.openContainer
         if (container is ContainerChest) {
             val chestName = container.lowerChestInventory.displayName.unformattedText

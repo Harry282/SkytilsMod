@@ -43,9 +43,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.io.File
 import java.io.Reader
 import java.io.Writer
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
 
 object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTimers.json")) {
     private val effectMenuTitle = Regex("^(?:\\((?<currPage>\\d+)\\/(?<lastPage>\\d+)\\) )?Active Effects\$")

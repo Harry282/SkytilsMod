@@ -143,10 +143,12 @@ object IcePathSolver {
     private fun getVec3RelativeToGrid(column: Int, row: Int): Vec3? {
         return silverfishChestPos?.let { chestPos ->
             roomFacing?.let { facing ->
-                Vec3(chestPos.offset(facing.opposite, 4)
-                    .offset(facing.rotateYCCW(), 8)
-                    .offset(facing.rotateY(), column)
-                    .offset(facing.opposite, row))
+                Vec3(
+                    chestPos.offset(facing.opposite, 4)
+                        .offset(facing.rotateYCCW(), 8)
+                        .offset(facing.rotateY(), column)
+                        .offset(facing.opposite, row)
+                )
             }
         }
     }

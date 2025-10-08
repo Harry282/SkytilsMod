@@ -24,7 +24,10 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
-import gg.skytils.skytilsmod.utils.*
+import gg.skytils.skytilsmod.utils.RenderUtil
+import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.middleVec
+import gg.skytils.skytilsmod.utils.printDevMessage
 import net.minecraft.entity.item.EntityItemFrame
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -40,9 +43,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
 import java.awt.Point
-import java.util.*
-import kotlin.collections.ArrayDeque
-import kotlin.random.Random
 
 object AlignmentTaskSolver {
     // the blocks are on the west side, frames block pos is 1 block higher
@@ -95,6 +95,7 @@ object AlignmentTaskSolver {
                                     14 -> SpaceType.END
                                     else -> SpaceType.PATH
                                 }
+
                                 else -> SpaceType.EMPTY
                             }
                         } ?: SpaceType.EMPTY

@@ -117,6 +117,7 @@ object StupidTreasureChestOpeningThing {
                     }
                 }
             }
+
             is S2APacketParticles -> {
                 packet.apply {
                     if (type == EnumParticleTypes.CRIT && isLongDistance && count == 1 && speed == 0f && xOffset == 0f && yOffset == 0f && zOffset == 0f) {
@@ -142,6 +143,7 @@ object StupidTreasureChestOpeningThing {
                     }
                 }
             }
+
             is S29PacketSoundEffect -> {
                 val sound = packet.soundName
                 val pitch = packet.pitch

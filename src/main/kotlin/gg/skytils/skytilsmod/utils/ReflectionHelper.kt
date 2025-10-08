@@ -22,12 +22,12 @@ import java.lang.reflect.Field
 import java.lang.reflect.Method
 
 object ReflectionHelper {
-    val classes = hashMapOf<String, Class<*>>()
-    val fields = hashMapOf<String, Field>()
-    val methods = hashMapOf<String, Method>()
+    val classesCache = hashMapOf<String, Class<*>>()
+    val fieldsCache = hashMapOf<String, Field>()
+    val methodsCache = hashMapOf<String, Method>()
 
     fun Class<*>.getFieldHelper(fieldName: String) = runCatching {
-        ReflectionHelper.fields.getOrPut("$name $fieldName") {
+        fieldsCache.getOrPut("$name $fieldName") {
             getDeclaredField(fieldName).apply {
                 isAccessible = true
             }
@@ -35,7 +35,7 @@ object ReflectionHelper {
     }.getOrNull()
 
     fun Class<*>.getMethodHelper(methodName: String) = runCatching {
-        ReflectionHelper.methods.getOrPut("$name $methodName") {
+        methodsCache.getOrPut("$name $methodName") {
             getDeclaredMethod(methodName).apply {
                 isAccessible = true
             }
@@ -43,7 +43,7 @@ object ReflectionHelper {
     }.getOrNull()
 
     fun getClassHelper(className: String) = runCatching {
-        classes.getOrPut(className) {
+        classesCache.getOrPut(className) {
             Class.forName(className)
         }
     }.getOrNull()

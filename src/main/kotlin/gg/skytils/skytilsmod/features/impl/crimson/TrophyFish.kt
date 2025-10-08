@@ -30,7 +30,7 @@ import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.UUID
+import java.util.*
 
 object TrophyFish {
     private val trophyFish = mutableMapOf<String, Fish>()
@@ -161,7 +161,7 @@ object TrophyFish {
         override fun demoRender() {
             TrophyFish.entries.forEachIndexed { idx, fish ->
                 fr.drawString(
-                    "${fish.formattedName} ${ChatColor.DARK_AQUA}» "+
+                    "${fish.formattedName} ${ChatColor.DARK_AQUA}» " +
                             "${ChatColor.DARK_GRAY}999${ChatColor.DARK_AQUA}-" +
                             "${ChatColor.GRAY}99${ChatColor.DARK_AQUA}-" +
                             "${ChatColor.GOLD}9${ChatColor.DARK_AQUA}-" +

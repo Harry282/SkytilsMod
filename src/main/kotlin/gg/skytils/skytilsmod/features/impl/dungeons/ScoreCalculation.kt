@@ -274,6 +274,7 @@ object ScoreCalculation {
 
                     ScoreCalculationElement.text.add("§$scoreColor${totalScore.get()}  §$cryptColor${crypts.get()}c  ${if (mimicKilled.get()) "§a✔" else "§c✘"}")
                 }
+
                 1 -> { // minimized style
                     val color = when {
                         score < 270 -> 'c'
@@ -282,6 +283,7 @@ object ScoreCalculation {
                     }
                     ScoreCalculationElement.text.add("§eScore: §$color$score §7($rank§7)")
                 }
+
                 else -> { // standard style
                     ScoreCalculationElement.text.add("§9Dungeon Status")
                     ScoreCalculationElement.text.add("§f• §eDeaths:§c ${deaths.get()} ${if (firstDeathHadSpirit.get()) "§7(§6Spirit§7)" else ""}")

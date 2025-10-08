@@ -32,7 +32,6 @@ import gg.skytils.skytilsmod.events.impl.*
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEntityArmorstand
-import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorWorldInfo
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import gg.skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
@@ -432,8 +431,7 @@ object MiscFeatures {
                     "§aUpgrade Slot"
                 )
             ) return
-            if (chestName == "Beacon"
-                && item.item === Item.getItemFromBlock(Blocks.furnace) && item.displayName == "§6Beacon Power") return
+            if (chestName == "Beacon" && item.item === Item.getItemFromBlock(Blocks.furnace) && item.displayName == "§6Beacon Power") return
             if (chestName.startsWithAny(
                     "Salvage Item"
                 ) && item.item === Item.getItemFromBlock(Blocks.beacon) && item.displayName == "§aSalvage Items"

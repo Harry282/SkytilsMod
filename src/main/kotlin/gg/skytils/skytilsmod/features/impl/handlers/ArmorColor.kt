@@ -21,7 +21,6 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
 import kotlinx.serialization.Contextual
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import java.io.File
 import java.io.Reader

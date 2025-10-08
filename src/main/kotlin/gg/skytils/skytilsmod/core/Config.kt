@@ -1984,7 +1984,7 @@ object Config : Vigilant(
     @Property(
         type = PropertyType.DECIMAL_SLIDER, name = "Crystal Hollows map player arrow scale",
         description = "Scale the arrow indicating the player on the crystal hollows map",
-        category = "Mining", subcategory  = "Crystal Hollows",
+        category = "Mining", subcategory = "Crystal Hollows",
         minF = 0.5f, maxF = 10f, decimalPlaces = 2,
         i18nName = "skytils.config.mining.crystal_hollows.player_arrow_scaling",
         i18nCategory = "skytils.config.mining",
@@ -4568,6 +4568,7 @@ object Config : Vigilant(
                         PersistentSave.markDirty<GuiManager>()
                     }
                 }
+
                 ver < UpdateChecker.SkytilsVersion("1.9.0-pre4") -> {
                     val cataclysmicMapDir = File("./config/skytils/cataclysmicmap")
                     val catlasDir = File("./config/skytils/catlas")

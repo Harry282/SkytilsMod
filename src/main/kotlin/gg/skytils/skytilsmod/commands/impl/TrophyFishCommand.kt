@@ -58,7 +58,7 @@ object TrophyFishCommand {
                     TrophyFish.generateLocalTrophyFishList(true).joinToString("\n") +
                             "\n" + TrophyFish.generateLocalTotalTrophyFish()
                 )
-            } else{
+            } else {
                 UChat.chat(
                     TrophyFish.generateLocalTrophyFishList(false).joinToString("\n")
                 )

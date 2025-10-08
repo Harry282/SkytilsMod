@@ -85,7 +85,7 @@ class AbstractClientPlayerHook(player: Any) {
         for (entity in nearbyEntities) {
             val name = entity.customNameTag
             val type = typeRegex.matchEntire(name)?.let { result ->
-                return@let result.groups["type"]?.value ?: return@let null
+                return@let result.groups["type"]?.value
             } ?: return null
             printDevMessage({ "summon type: $type" }, "summonskins")
             return type.lowercase().replace(' ', '_')

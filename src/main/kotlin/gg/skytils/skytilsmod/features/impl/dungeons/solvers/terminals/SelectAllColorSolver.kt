@@ -77,6 +77,7 @@ object SelectAllColorSolver {
                 if (event.packet.func_149175_c() != windowId) return
                 handleItemStack(event.packet.func_149173_d(), event.packet.func_149174_e())
             }
+
             is S30PacketWindowItems -> {
                 if (event.packet.func_148911_c() != windowId) return
                 event.packet.itemStacks.forEachIndexed(::handleItemStack)

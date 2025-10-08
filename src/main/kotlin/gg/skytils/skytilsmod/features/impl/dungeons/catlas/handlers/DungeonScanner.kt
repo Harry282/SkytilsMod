@@ -20,7 +20,6 @@ package gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers
 
 import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.IO
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures.dungeonFloorNumber
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.*
@@ -30,7 +29,6 @@ import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsmod.utils.printDevMessage
 import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonRoom
-import kotlinx.coroutines.launch
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 

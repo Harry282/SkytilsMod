@@ -47,8 +47,8 @@ import kotlin.math.max
 import kotlin.math.min
 
 /**
-* The goal of this class is to generate an image that stitches together the textures of the highest blocks in the dungeon
-*/
+ * The goal of this class is to generate an image that stitches together the textures of the highest blocks in the dungeon
+ */
 @Commands
 object TopographyGenerator {
     init {

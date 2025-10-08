@@ -47,6 +47,7 @@ object CalcXPCommand {
                     UChat.chat("$failPrefix §cUnable to find corresponding slayer. (${type.substringBefore("_slayer")})")
                     return
                 }
+
             type == "dungeons" -> SkillUtils.dungeoneeringXp
             type == "skill" -> SkillUtils.skillXp
             else -> {

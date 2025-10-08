@@ -136,18 +136,22 @@ object SheepifyRebellion {
                     fakeEntity.isTamed = true
                     fakeEntity.collarColor = EnumDyeColor.byDyeDamage((least % 16).toInt())
                 }
+
                 is EntitySkeleton -> fakeEntity.skeletonType = (least % 2).toInt()
                 is EntityHorse -> {
                     fakeEntity.horseType = (least % 5).toInt()
                     fakeEntity.horseVariant = (most % 7).toInt() or ((least % 5).toInt() shl 8)
                     fakeEntity.isHorseSaddled = (most % 2).toInt() == 1
                 }
+
                 is EntityRabbit -> {
                     fakeEntity.rabbitType = (least % 7).toInt().takeIf { it != 6 } ?: 99
                 }
+
                 is EntitySlime -> {
                     (fakeEntity as AccessorEntitySlime).invokeSetSlimeSize((least % 3).toInt())
                 }
+
                 is EntityBat -> {
                     fakeEntity.isBatHanging = false
                 }

@@ -29,7 +29,6 @@ import java.io.File
 import java.io.Reader
 import java.io.Writer
 import java.util.*
-import kotlin.collections.sortedMapOf
 
 object CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json")) {
     val aliases get() = _aliases

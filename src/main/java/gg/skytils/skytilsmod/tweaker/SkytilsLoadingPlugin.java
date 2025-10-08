@@ -41,8 +41,6 @@ import static gg.skytils.skytilsmod.tweaker.TweakerUtil.showMessage;
 @IFMLLoadingPlugin.SortingIndex(69)
 public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
 
-    private static final Logger LOGGER = LogManager.getLogger("Skytils Loading Plugin");
-
     public static final String missingDependency =
             "<html><p>" +
                     "Skytils has detected a possible missing dependency<br>" +
@@ -52,7 +50,6 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                     "Check the Skytils Discord for any announcements, and<br>" +
                     "if there are none, ask for support." +
                     "</p></html>";
-
     public static final String badMixinVersionMessage =
             "<html><p>" +
                     "Skytils has detected an older version of Mixin.<br>" +
@@ -63,7 +60,6 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                     "by changing Skytils.jar to !Skytils.jar<br>" +
                     "If you have already done this and are still getting this error,<br>" +
                     "ask for support in the Discord.";
-
     public static final String liteloaderUserMessage =
             "<html><p>" +
                     "Skytils has detected that you are using LiteLoader.<br>" +
@@ -73,7 +69,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                     "If you have already done this and are still getting this error,<br>" +
                     "ask for support in the Discord." +
                     "</p></html>";
-
+    private static final Logger LOGGER = LogManager.getLogger("Skytils Loading Plugin");
     private static final String voidChatMessage =
             "<html><p>" +
                     "Skytils has detected that you are using VoidChat.<br>" +
@@ -143,7 +139,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                 } else if (essentialUpdateMode == EssentialPendingUpdateMode.Accepted) {
                     showMessage(essentialUpdateAcceptedMessage);
                     exit();
-                } else if (essentialUpdateMode == EssentialPendingUpdateMode.Pending){
+                } else if (essentialUpdateMode == EssentialPendingUpdateMode.Pending) {
                     JButton acceptEssentialUpdate = new JButton("Accept Essential Update");
                     acceptEssentialUpdate.addActionListener(e -> {
                         // updates the pendingUpdateResolution key to true
@@ -182,6 +178,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
 
     /**
      * Checks the status of essential's update prompt
+     *
      * @return update status
      */
     private EssentialPendingUpdateMode checkPendingEssentialUpdateStatus() {
@@ -223,6 +220,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
      * Updates the `pendingUpdateResolution` key based on the `accepted` boolean:
      * false - remove the key to trigger Essential's own updater
      * true - update the key to true to auto update on next launch
+     *
      * @param accepted whether the update has been accepted or not
      */
     private void updatePendingEssentialUpdateStatus(boolean accepted) {

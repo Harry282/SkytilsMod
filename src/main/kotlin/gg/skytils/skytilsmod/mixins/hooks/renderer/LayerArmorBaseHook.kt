@@ -61,7 +61,6 @@ fun replaceArmorGlint(
                 for (i in 0..1) {
                     GlStateManager.disableLighting()
                     GlStateManager.blendFunc(768, 1)
-                    val f2 = 0.76f
                     //GlStateManager.color(0.5F * f2, 0.25F * f2, 0.8F * f2, 1.0F);
                     color.applyColor()
                     GlStateManager.matrixMode(5890)

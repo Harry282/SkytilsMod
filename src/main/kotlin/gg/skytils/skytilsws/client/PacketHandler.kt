@@ -62,6 +62,7 @@ object PacketHandler : IPacketHandler {
                     }
                 }
             }
+
             is S2CPacketDungeonRoomSecret -> {
                 DungeonInfo.uniqueRooms[packet.roomId]?.let {
                     if (packet.secretCount > (it.foundSecrets ?: -1)) {
@@ -69,6 +70,7 @@ object PacketHandler : IPacketHandler {
                     }
                 }
             }
+
             is S2CPacketDungeonRoom -> {
                 val room = DungeonInfo.dungeonList[packet.row * 11 + packet.col]
                 if (room is Unknown || (room as? Room)?.data?.name == "Unknown") {
@@ -80,12 +82,15 @@ object PacketHandler : IPacketHandler {
                     }
                 }
             }
+
             is S2CPacketDungeonMimic -> {
                 ScoreCalculation.mimicKilled.set(true)
             }
+
             is S2CPacketCHReset -> {
                 CHWaypoints.waypoints.remove(packet.serverId)
             }
+
             is S2CPacketCHWaypoint -> {
                 val currentServer = SBInfo.server
                 if (currentServer == packet.serverId) {
@@ -108,6 +113,7 @@ object PacketHandler : IPacketHandler {
                     instance.waypoints[packet.type] = BlockPos(packet.x, packet.y, packet.z)
                 }
             }
+
             is S2CPacketJerryMayor -> {
                 MayorInfo.jerryMayor = MayorInfo.mayorData.find { it.name == packet.mayor }
                 MayorInfo.newJerryPerks = packet.endTime
@@ -115,6 +121,7 @@ object PacketHandler : IPacketHandler {
                     MayorInfo.fetchMayorData()
                 }
             }
+
             else -> {
                 session.close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, "Unknown packet type"))
             }

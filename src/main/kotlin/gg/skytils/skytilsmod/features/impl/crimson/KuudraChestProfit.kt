@@ -36,7 +36,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.TreeSet
+import java.util.*
 
 
 /**
@@ -77,10 +77,10 @@ object KuudraChestProfit {
     }
 
     private fun getKeyNeeded(lore: List<String>): KuudraKey? {
-        for (i in 0..<lore.size-1) {
+        for (i in 0..<lore.size - 1) {
             val line = lore[i]
             if (line == "§7Cost") {
-                val cost = lore[i+1]
+                val cost = lore[i + 1]
                 if (cost == "§aThis Chest is Free!") return null
                 return KuudraKey.entries.first { it.displayName == cost.stripControlCodes() }
             }
@@ -190,9 +190,11 @@ object KuudraChestProfit {
     }
 
     private var textShadow_ = SmartFontRenderer.TextShadow.NORMAL
+
     private data class KuudraChestLootItem(var stackSize: Int, var displayText: String, var value: Double) : Comparable<KuudraChestLootItem> {
         override fun compareTo(other: KuudraChestLootItem): Int = value.compareTo(other.value)
     }
+
     class KuudraChestProfitElement : GuiElement("Kuudra Chest Profit", x = 200, y = 120) {
         override fun render() {
             if (toggled && SBInfo.mode == SkyblockIsland.KuudraHollow.mode) {
@@ -235,7 +237,7 @@ object KuudraChestProfit {
         HOT("Hot Kuudra Key", ItemRarity.EPIC, 400000, 6),
         BURNING("Burning Kuudra Key", ItemRarity.EPIC, 750000, 20),
         FIERY("Fiery Kuudra Key", ItemRarity.EPIC, 1500000, 60),
-        INFERNAL("Infernal Kuudra Key", ItemRarity.LEGENDARY,3000000, 120);
+        INFERNAL("Infernal Kuudra Key", ItemRarity.LEGENDARY, 3000000, 120);
 
         // treat NPC discounts as negligible
         fun getPrice(faction: CrimsonFaction): Double {

@@ -54,15 +54,9 @@ class RainbowColor(var speed: Int, var offset: Int, var saturation: Float, var b
             val greenc = (cmax - g) / (cmax - cmin)
             val bluec = (cmax - b) / (cmax - cmin)
             hue = when {
-                r == cmax -> {
-                    bluec - greenc
-                }
-                g == cmax -> {
-                    2.0f + redc - bluec
-                }
-                else -> {
-                    4.0f + greenc - redc
-                }
+                r == cmax -> bluec - greenc
+                g == cmax -> 2.0f + redc - bluec
+                else -> 4.0f + greenc - redc
             }
             hue /= 6.0f
             if (hue < 0) {

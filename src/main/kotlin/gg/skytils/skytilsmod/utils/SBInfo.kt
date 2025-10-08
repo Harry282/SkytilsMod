@@ -35,8 +35,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent
-import java.text.ParseException
 import org.apache.commons.lang3.time.FastDateFormat
+import java.text.ParseException
 import java.util.*
 
 /**
@@ -82,7 +82,7 @@ object SBInfo {
     }
 
     @SubscribeEvent
-    fun onDisconnect(event: ClientDisconnectionFromServerEvent)  {
+    fun onDisconnect(event: ClientDisconnectionFromServerEvent) {
         mode = null
         server = null
         serverType = null

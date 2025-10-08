@@ -204,6 +204,7 @@ object GriffinBurrows {
                     event.packet is C07PacketPlayerDigging && event.packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK -> {
                         event.packet.position
                     }
+
                     event.packet is C08PacketPlayerBlockPlacement && event.packet.stack != null -> event.packet.position
                     else -> return
                 }
@@ -295,6 +296,7 @@ object GriffinBurrows {
                     }
                 }
             }
+
             is S04PacketEntityEquipment -> {
                 if (!Skytils.config.burrowEstimation || SBInfo.mode != SkyblockIsland.Hub.mode || Skytils.config.experimentBurrowEstimation) return
                 val entity = mc.theWorld?.getEntityByID(event.packet.entityID)
@@ -308,7 +310,7 @@ object GriffinBurrows {
                         0.0,
                         cos(yaw)
                     )
-                    val offset = Vec3(-sin(yaw + PI/2), 0.0, cos(yaw + PI/2)) * 0.9
+                    val offset = Vec3(-sin(yaw + PI / 2), 0.0, cos(yaw + PI / 2)) * 0.9
                     val origin = armorStand.positionVector.add(offset)
                     BurrowEstimation.arrows.put(BurrowEstimation.Arrow(lookVec, origin), Instant.now())
                 }
@@ -420,10 +422,12 @@ object GriffinBurrows {
                         waypointText = "§aStart §a(Particle)"
                         color = Skytils.config.emptyBurrowColor
                     }
+
                     1 -> {
                         waypointText = "§cMob §a(Particle)"
                         color = Skytils.config.mobBurrowColor
                     }
+
                     2 -> {
                         waypointText = "§6Treasure §a(Particle)"
                         color = Skytils.config.treasureBurrowColor

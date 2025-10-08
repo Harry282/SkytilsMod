@@ -71,7 +71,7 @@ object KuudraFeatures {
             }
         }
     }
- }
+}
 
 enum class CrimsonFaction(val color: ChatColor, val keyMaterial: String) {
     BARBARIAN(ChatColor.RED, "ENCHANTED_RED_SAND"),

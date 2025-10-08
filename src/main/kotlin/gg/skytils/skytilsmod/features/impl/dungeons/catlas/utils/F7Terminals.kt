@@ -57,7 +57,6 @@ enum class F7Terminals(val pos: BlockPos, val type: Type) {
     P4_LEVER_2(BlockPos(86, 128, 46), Type.LEVER);
 
 
-
     enum class Type(val item: ItemStack) {
         TERMINAL(ItemStack(Blocks.command_block)),
         DEVICE(ItemStack(Blocks.glowstone)),

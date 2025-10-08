@@ -83,7 +83,6 @@ object EntityManager {
             }
             val renderManager = mc.renderManager
             if (renderManager?.options == null) return
-            val player = mc.thePlayer
             // ticks each entity
             it = entityList.iterator()
             while (it.hasNext()) {

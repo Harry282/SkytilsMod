@@ -278,7 +278,7 @@ object CataCommand {
                 )
                 .chat()
         } catch (e: Throwable) {
-            UChat.chat("${Skytils.Companion.failPrefix} §cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
+            UChat.chat("$failPrefix §cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
             e.printStackTrace()
         }
     }

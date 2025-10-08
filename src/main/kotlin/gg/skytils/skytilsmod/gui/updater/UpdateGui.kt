@@ -185,6 +185,7 @@ class UpdateGui(restartNow: Boolean) : GuiScreen() {
                 height / 2,
                 -0x1
             )
+
             complete -> drawCenteredString(
                 mc.fontRendererObj,
                 "§aUpdate download complete",
@@ -192,6 +193,7 @@ class UpdateGui(restartNow: Boolean) : GuiScreen() {
                 height / 2,
                 0xFFFFFF
             )
+
             else -> {
                 val left = (width / 2 - 100).coerceAtLeast(10)
                 val right = (width / 2 + 100).coerceAtMost(width - 10)

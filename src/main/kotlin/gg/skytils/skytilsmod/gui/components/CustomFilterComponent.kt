@@ -38,7 +38,6 @@ import gg.essential.vigilance.gui.settings.CheckboxComponent
 import gg.essential.vigilance.gui.settings.DropDown
 import gg.skytils.skytilsmod.features.impl.handlers.SpamHider
 import gg.skytils.skytilsmod.utils.toTitleCase
-import java.awt.Color
 
 /**
  * Based on Vigilance under LGPL 3.0 license

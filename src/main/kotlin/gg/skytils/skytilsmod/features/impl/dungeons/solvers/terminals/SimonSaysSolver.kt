@@ -22,12 +22,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
-import gg.skytils.skytilsmod.features.impl.funny.Funny
-import gg.skytils.skytilsmod.utils.RenderUtil
-import gg.skytils.skytilsmod.utils.SuperSecretSettings
-import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.middleVec
-import gg.skytils.skytilsmod.utils.printDevMessage
+import gg.skytils.skytilsmod.utils.*
 import net.minecraft.block.BlockButtonStone
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager

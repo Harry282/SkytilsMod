@@ -77,6 +77,7 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
                         it.readBytes().decodeToString()
                     }
                 }
+
                 2 -> {
                     val wrapped = bombChecker.wrapInput(Base64InputStream(content.byteInputStream()))
 
@@ -152,9 +153,19 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
                     val options = obj["options"]?.jsonObject
 
                     val pos = obj["pos"].let {
-                        if (it == null) BlockPos(obj["x"]!!.jsonPrimitive.int, obj["y"]!!.jsonPrimitive.int, obj["z"]!!.jsonPrimitive.int)
-                        else if (it is JsonPrimitive) BlockPos.fromLong(it.long)
-                        else BlockPos(it.jsonObject["x"]!!.jsonPrimitive.int, it.jsonObject["y"]!!.jsonPrimitive.int, it.jsonObject["z"]!!.jsonPrimitive.int)
+                        when (it) {
+                            null -> BlockPos(
+                                obj["x"]!!.jsonPrimitive.int,
+                                obj["y"]!!.jsonPrimitive.int,
+                                obj["z"]!!.jsonPrimitive.int
+                            )
+                            is JsonPrimitive -> BlockPos.fromLong(it.long)
+                            else -> BlockPos(
+                                it.jsonObject["x"]!!.jsonPrimitive.int,
+                                it.jsonObject["y"]!!.jsonPrimitive.int,
+                                it.jsonObject["z"]!!.jsonPrimitive.int
+                            )
+                        }
                     }
 
                     var r = (obj["r"] ?: options?.get("r"))?.jsonPrimitive?.float
@@ -253,13 +264,14 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
         val realPath = if (!path.name.endsWith(".V$version.SkytilsWaypoints")) path.resolveSibling("${path.name}.V$version.SkytilsWaypoints") else path
         when (version) {
             2 -> {
-                if (!DependencyLoader.hasNativeBrotli) error ("Brotli encoder is not available")
+                if (!DependencyLoader.hasNativeBrotli) error("Brotli encoder is not available")
                 BrotliOutputStream(realPath.outputStream(), Encoder.Parameters().apply {
                     setQuality(11)
                 }).use {
                     it.write(json.encodeToString(categoryList).encodeToByteArray())
                 }
             }
+
             else -> throw IllegalArgumentException("Unknown version $version")
         }
     }
@@ -369,6 +381,7 @@ data class WaypointCategory(
     @Serializable(with = SkyblockIsland.ModeSerializer::class)
     var island: SkyblockIsland
 )
+
 @Serializable
 data class Waypoint @OptIn(ExperimentalSerializationApi::class) constructor(
     var name: String,

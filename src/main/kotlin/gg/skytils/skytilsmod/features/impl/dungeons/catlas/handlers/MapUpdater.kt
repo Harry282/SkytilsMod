@@ -55,7 +55,7 @@ object MapUpdater {
     }
 
     fun updatePlayersUsingEntity() {
-        DungeonListener.team.forEach { (name, team) ->
+        DungeonListener.team.forEach { (_, team) ->
             team.player?.let {
                 team.mapPlayer.yaw = it.rotationYaw
                 team.mapPlayer.mapX =
@@ -112,7 +112,7 @@ object MapUpdater {
                         )
                         if (chunk.isLoaded) {
                             if (chunk.getBlockState(BlockPos(room.x, 69, room.z)).block == Blocks.air)
-                            room.opened = true
+                                room.opened = true
                         } else if (mapTile is Door && mapTile.state == RoomState.DISCOVERED) {
                             if (room.type == DoorType.BLOOD) {
                                 val bloodRoom = DungeonInfo.uniqueRooms["Blood"]

@@ -18,7 +18,6 @@
 
 package gg.skytils.skytilsmod.features.impl.trackers.impl
 
-import gg.essential.universal.UChat
 import gg.essential.universal.utils.MCClickEventAction
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.skytilsmod.Skytils
@@ -34,6 +33,7 @@ import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.network.play.server.S02PacketChat
@@ -43,7 +43,6 @@ import java.io.Reader
 import java.io.Writer
 import java.util.*
 import kotlin.math.pow
-import kotlinx.serialization.Serializable
 
 object MythologicalTracker : Tracker("mythological") {
 

@@ -32,8 +32,8 @@ import io.ktor.client.plugins.websocket.*
 import io.ktor.serialization.kotlinx.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import java.util.zip.Deflater
 
@@ -84,7 +84,7 @@ object WSClient {
                         val packet = receiveDeserialized<Packet>()
                         PacketHandler.processPacket(this@apply, packet)
                     }
-                } catch(e: ClosedReceiveChannelException) {
+                } catch (e: ClosedReceiveChannelException) {
                     e.printStackTrace()
                     closeExceptionally(e)
                 } catch (e: Throwable) {

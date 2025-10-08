@@ -68,6 +68,7 @@ object CHWaypoints {
     private val xzPattern =
         Regex(".*(?<user>[a-zA-Z0-9_]{3,16}):.* (?<x>[0-9]{1,3}),? (?<z>[0-9]{1,3}).*")
     val chWaypointsList = hashMapOf<String, CHInstance>()
+
     class CHInstance {
         val createTime = System.currentTimeMillis()
         val waypoints = hashMapOf<CHWaypointType, BlockPos>()
@@ -340,7 +341,7 @@ object CHWaypoints {
                 // Rotate about the center to match the player's yaw
                 stack.rotate((mc.thePlayer.rotationYawHead + 180f) % 360f, 0f, 0f, 1f)
                 stack.scale(playerScale, playerScale, 1f)
-                stack.translate((-0.125f*playerScale).toDouble(), (0.125f*playerScale).toDouble(), 0.0)
+                stack.translate((-0.125f * playerScale).toDouble(), (0.125f * playerScale).toDouble(), 0.0)
                 UGraphics.color4f(1f, 1f, 1f, 1f)
                 UGraphics.enableAlpha()
                 val d1 = 0.0

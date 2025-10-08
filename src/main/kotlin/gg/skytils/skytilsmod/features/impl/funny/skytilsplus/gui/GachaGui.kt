@@ -37,7 +37,6 @@ import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.SkytilsPlus
 import gg.skytils.skytilsmod.gui.components.SimpleButton
-import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.splitToWords
 import kotlinx.coroutines.*
 import net.minecraftforge.fml.common.Loader

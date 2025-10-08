@@ -108,7 +108,7 @@ class SuperSecretGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopen
             height = 9.5.percent()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f))
 
-        val setting = UITextInput("Secret").childOf(container).constrain {
+        UITextInput("Secret").childOf(container).constrain {
             x = 5.pixels()
             y = CenterConstraint()
             width = 70.percent()
