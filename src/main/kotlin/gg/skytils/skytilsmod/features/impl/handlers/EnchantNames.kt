@@ -21,7 +21,6 @@ package gg.skytils.skytilsmod.features.impl.handlers
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.utils.DevTools
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -32,40 +31,35 @@ import java.io.Writer
 
 object EnchantNames : PersistentSave(File(Skytils.modDir, "enchantnames.json")) {
     private val enchantRegex =
-        Regex("(?<color>(?:§[0-9a-fzl]){1,2})(?<enchant> ?[\\w ]+[\\w \\-]*?)(?<level> [IVXLCDM0-9]{1,3})(?<suffix>§[9d], )?")
+        Regex("(?<color>(?:§[0-9a-fzlr]){1,2})(?<enchant> ?[\\w ]+[\\w \\-]*?)(?<level> [IVXLCDM0-9]{1,3})(?<suffix>§[9d], )?")
     val replacements = hashMapOf<String, String>()
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
-        event.toolTip.replaceAll {
-            var newline = it
-            enchantRegex.findAll(
-                it
-            ).forEach { result ->
-                val color = result.groups["color"]!!.value
-                val enchant = result.groups["enchant"]!!.value
-                val level = result.groups["level"]!!.value
+        if (replacements.isEmpty()) return
+        event.toolTip.replaceAll { line ->
+            val matches = enchantRegex.findAll(line)
+            if (matches.count() == 0) return@replaceAll line
+            matches.fold(line) { current, result ->
+                val (color, enchant, level) = result.destructured
+                if (replacements[enchant] == null) return@fold current
                 val suffix = result.groups["suffix"]?.value ?: ""
                 if (DevTools.getToggle("enchantNames")) {
                     println(enchant)
                     println(result.groups)
                 }
-                newline = newline.replace(
+                current.replace(
                     result.value,
                     buildString {
                         append(color)
                         if (DevTools.getToggle("enchantNames")) append("{")
-                        if (replacements[enchant] != null)
-                            append("§o${enchant.replaceEnchantNames()}")
-                        else
-                            append(enchant)
+                        append("§o${enchant.replaceEnchantNames()}")
                         append(level)
                         if (DevTools.getToggle("enchantNames")) append("}")
                         append(suffix)
                     }
                 )
             }
-            newline
         }
     }
 
