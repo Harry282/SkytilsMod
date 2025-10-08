@@ -37,8 +37,10 @@ import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -78,8 +80,9 @@ object DungeonChestProfit {
                 chestType.price = getChestPrice(ItemUtil.getItemLore(openChest))
                 chestType.value = 0.0
                 chestType.items.clear()
-                for (i in 9..17) {
+                for (i in 10..25) {
                     val lootSlot = inv.getStackInSlot(i) ?: continue
+                    if (lootSlot.item == Item.getItemFromBlock(Blocks.stained_glass_pane)) continue
                     val identifier = AuctionData.getIdentifier(lootSlot)
                     val value = if (identifier != null) {
                         AuctionData.lowestBINs[identifier] ?: 0.0
