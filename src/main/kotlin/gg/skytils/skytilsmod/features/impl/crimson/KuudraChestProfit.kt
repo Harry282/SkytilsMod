@@ -19,12 +19,10 @@ package gg.skytils.skytilsmod.features.impl.crimson
 
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.IO
-import gg.skytils.skytilsmod.core.MC
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
+import gg.skytils.skytilsmod.features.impl.dungeons.DungeonChestProfit
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
-import gg.skytils.skytilsmod.features.impl.handlers.KuudraPriceData
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiContainer
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -32,9 +30,6 @@ import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
@@ -49,7 +44,6 @@ import java.util.TreeSet
  */
 object KuudraChestProfit {
     private val element = KuudraChestProfitElement()
-    private val essenceRegex = Regex("§d(?<type>\\w+) Essence §8x(?<count>\\d+)")
 
     @SubscribeEvent
     fun onGUIDrawnEvent(event: GuiContainerEvent.ForegroundDrawnEvent) {
@@ -96,10 +90,17 @@ object KuudraChestProfit {
 
     private fun getEssenceValue(text: String): Double? {
         if (!Skytils.config.kuudraChestProfitIncludesEssence) return null
-        val groups = essenceRegex.matchEntire(text)?.groups ?: return null
+        val groups = DungeonChestProfit.essenceRegex.matchEntire(text)?.groups ?: return null
         val type = groups["type"]?.value?.uppercase() ?: return null
         val count = groups["count"]?.value?.toInt() ?: return null
         return (AuctionData.lowestBINs["ESSENCE_$type"] ?: 0.0) * count
+    }
+
+    private fun getShardValue(text: String): Double? {
+        val groups = DungeonChestProfit.shardRegex.matchEntire(text)?.groups ?: return null
+        val type = groups["type"]?.value?.uppercase()?.replace(" ", "_") ?: return null
+        val count = groups["count"]?.value?.toInt() ?: return null
+        return (AuctionData.lowestBINs["SHARD_$type"] ?: 0.0) * count
     }
 
     private fun drawChestProfit(chest: KuudraChest) {
@@ -164,34 +165,18 @@ object KuudraChestProfit {
         }
 
         fun addItem(item: ItemStack) {
-            IO.launch {
-                val identifier = AuctionData.getIdentifier(item)
-                val extraAttr = ItemUtil.getExtraAttributes(item)
-                var displayName = item.displayName
-
-                val itemValue = if (identifier == null) {
-                    getEssenceValue(item.displayName) ?: return@launch
-                } else if ((extraAttr?.getCompoundTag("attributes")?.keySet?.size ?: 0) > 1) {
-                    val priceData = KuudraPriceData.getOrFetchAttributePricedItem(item)
-                    if (priceData != null && priceData != KuudraPriceData.AttributePricedItem.EMPTY && priceData != KuudraPriceData.AttributePricedItem.FAILURE) {
-                        priceData.price
-                    } else {
-                        if (priceData != null) {
-                            displayName += "§c (Failed to fetch price ${if (priceData == KuudraPriceData.AttributePricedItem.FAILURE) "from API" else ", not on AH"})"
-                        } else {
-                            displayName += "§c (Failed to fetch price, using LBIN)"
-                        }
-                        AuctionData.lowestBINs[identifier] ?: 0.0
-                    }
-                } else {
-                    AuctionData.lowestBINs[identifier] ?: 0.0
-                }
-                withContext(Dispatchers.MC) {
-                    items.add(KuudraChestLootItem(item.stackSize, displayName, itemValue))
-
-                    value += itemValue
-                }
+            val identifier = AuctionData.getIdentifier(item)
+            val displayName = item.displayName
+            val itemValue = if (identifier != null) {
+                AuctionData.lowestBINs[identifier] ?: 0.0
+            } else if (displayName.contains("Essence")) {
+                getEssenceValue(displayName) ?: 0.0
+            } else {
+                getShardValue(displayName) ?: return
             }
+
+            items.add(KuudraChestLootItem(item.stackSize, displayName, itemValue))
+            value += itemValue
         }
 
         companion object {
@@ -252,16 +237,11 @@ object KuudraChestProfit {
         FIERY("Fiery Kuudra Key", ItemRarity.EPIC, 1500000, 60),
         INFERNAL("Infernal Kuudra Key", ItemRarity.LEGENDARY,3000000, 120);
 
-        companion object {
-            // all keys cost 2 CORRUPTED_NETHER_STAR but nether stars are coop-soulbound
-            const val starConstant = 2
-        }
-
         // treat NPC discounts as negligible
         fun getPrice(faction: CrimsonFaction): Double {
             val keyMaterialCost = AuctionData.lowestBINs[faction.keyMaterial] ?: 0.0
-
-            return coinCost + keyMaterialCost * materialCost
+            val starCost = AuctionData.lowestBINs["CORRUPTED_NETHER_STAR"] ?: 0.0
+            return coinCost + keyMaterialCost * materialCost + starCost * 2
         }
     }
 }

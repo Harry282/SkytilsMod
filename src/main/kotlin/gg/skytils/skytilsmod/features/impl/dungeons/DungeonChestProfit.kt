@@ -57,8 +57,8 @@ import java.util.TreeSet
 object DungeonChestProfit {
     private val element = DungeonChestProfitElement()
     private var rerollBypass = false
-    private val essenceRegex = Regex("§d(?<type>\\w+) Essence §8x(?<count>\\d+)")
-    private val shardRegex = Regex("§.(?<type>.+) Shard §8x(?<count>\\d+)")
+    val essenceRegex = Regex("§d(?<type>\\w+) Essence §8x(?<count>\\d+)")
+    val shardRegex = Regex("§.(?<type>.+) Shard §8x(?<count>\\d+)")
     private val croesusChestRegex = Regex("^(Master Mode )?The Catacombs - Flo(or (IV|V?I{0,3}))?$")
 
     @SubscribeEvent

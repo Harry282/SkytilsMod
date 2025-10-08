@@ -62,17 +62,6 @@ object Config : Vigilant(
     var connectToWS = true
 
     @Property(
-        type = PropertyType.SWITCH, name = "Fetch Kuudra Prices",
-        description = "Fetches the Kuudra prices for Skytils to use.\nSkytils currently uses a third-party to retrieve this information.\nSome features will be hidden and will not work if this switch isn't on.",
-        category = "General", subcategory = "API",
-        searchTags = ["Kuudra Chest Profit"],
-        i18nName = "skytils.config.general.api.fetch_kuudra_prices",
-        i18nCategory = "skytils.config.general",
-        i18nSubcategory = "skytils.config.general.api"
-    )
-    var fetchKuudraPrices = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Fetch Lowest BIN Prices",
         description = "Fetches the lowest BIN features for Skytils to use.\nSome features will be hidden and will not work if this switch isn't on.",
         category = "General", subcategory = "API",
@@ -1861,16 +1850,6 @@ object Config : Vigilant(
         i18nSubcategory = "skytils.config.kuudra.price_checking"
     )
     var kuudraChestProfitCountsKey = true
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Show Kuudra Lowest BIN Price",
-        description = "Shows the lowest Buy It Now price (including attributes) for various items in Skyblock.",
-        category = "Kuudra", subcategory = "Price Checking",
-        i18nName = "skytils.config.kuudra.price_checking.show_kuudra_lowest_bin_price",
-        i18nCategory = "skytils.config.kuudra",
-        i18nSubcategory = "skytils.config.kuudra.price_checking"
-    )
-    var showKuudraLowestBinPrice = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Dark Mode Mist",
@@ -4446,19 +4425,11 @@ object Config : Vigilant(
             "containerSellValue",
             "visitorOfferHelper",
             "showCoinsPerCopper",
-            "kuudraChestProfit",
-            "fetchKuudraPrices"
+            "kuudraChestProfit"
         ).forEach { propertyName ->
             addDependency(propertyName, "fetchLowestBINPrices")
             registerListener(propertyName) { prop: Any ->
                 if (prop is Boolean && prop) fetchLowestBINPrices = true
-            }
-        }
-
-        arrayOf("kuudraChestProfit").forEach { propertyName ->
-            addDependency(propertyName, "fetchKuudraPrices")
-            registerListener(propertyName) { prop: Any ->
-                if (prop is Boolean && prop) fetchKuudraPrices = true
             }
         }
 
