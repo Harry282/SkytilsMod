@@ -483,20 +483,6 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                     }
                 }
 
-                // Blessing enchant
-                formatted.startsWith("§r§aYour Blessing enchant") -> {
-                    when (Skytils.config.blessingEnchantHider) {
-                        1, 2 -> cancelChatPacket(event, Skytils.config.blessingEnchantHider == 2)
-                    }
-                }
-
-                // Blessing bair
-                formatted.startsWith("§r§aYour bait got you double") -> {
-                    when (Skytils.config.blessedBaitHider) {
-                        1, 2 -> cancelChatPacket(event, Skytils.config.blessedBaitHider == 2)
-                    }
-                }
-
                 // Sea creature catch
                 formatted.startsWith("§r§a") && SEA_CREATURES.contains(unformatted) -> {
                     when (Skytils.config.scCatchHider) {

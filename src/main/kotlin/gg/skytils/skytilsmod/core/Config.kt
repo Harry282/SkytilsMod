@@ -4305,28 +4305,6 @@ object Config : Vigilant(
     var spookyMessageHider = 0
 
     @Property(
-        type = PropertyType.SELECTOR, name = "Blessing Enchant Hider",
-        description = "Removes blessing enchant message from fishing.",
-        category = "Spam", subcategory = "Fishing",
-        options = ["Normal", "Hidden", "Separate GUI"],
-        i18nName = "skytils.config.spam.fishing.blessing_enchant_hider",
-        i18nCategory = "skytils.config.spam",
-        i18nSubcategory = "skytils.config.spam.fishing"
-    )
-    var blessingEnchantHider = 0
-
-    @Property(
-        type = PropertyType.SELECTOR, name = "Blessed Bait Hider",
-        description = "Removes blessed bait message from fishing.",
-        category = "Spam", subcategory = "Fishing",
-        options = ["Normal", "Hidden", "Separate GUI"],
-        i18nName = "skytils.config.spam.fishing.blessed_bait_hider",
-        i18nCategory = "skytils.config.spam",
-        i18nSubcategory = "skytils.config.spam.fishing"
-    )
-    var blessedBaitHider = 0
-
-    @Property(
         type = PropertyType.SELECTOR, name = "Sea Creature Catch Hider",
         description = "Removes regular sea creature catch messages from fishing.",
         category = "Spam", subcategory = "Fishing",
